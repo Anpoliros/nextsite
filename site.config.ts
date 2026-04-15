@@ -20,8 +20,29 @@ export const siteConfig = {
   
   ui: {
     // 锁定纵横比
-    heroAspectRatio: "aspect-[21/9]", // 如 'aspect-[21/9]' 或 'aspect-video'
+    heroAspectRatio: "aspect-[4/3] md:aspect-[21/9]", // 增加了移动端比例
     categoryBannerAspectRatio: "aspect-[4/1]",
+    // 深浅模式Hero图片
+    heroImages: {
+      light: "/bg-light.jpg", // 可换成你真实的图片链接或本地路径
+      dark: "/bg-dark.jpg",
+    },
+    // Hero 文本颜色控制
+    heroColors: {
+      title: "text-black dark:text-white",
+      subtitle: "text-gray-500 dark:text-gray-300",
+    },
+    // 网站主题基础颜色：在这里直接定义 Hex / RGB 颜色值
+    themeColors: {
+      light: {
+        background: "#fffdfc",
+        text: "#171717",
+      },
+      dark: {
+        background: "#0a0a0a",
+        text: "#ededed",
+      }
+    },
     // 字号控制
     fontSizes: {
       headerLogo: "text-2xl",
