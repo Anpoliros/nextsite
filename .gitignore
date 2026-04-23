@@ -2,7 +2,18 @@
 
 # content
 /public/images
-/content
+
+# 忽略 content 下所有内容
+content/*
+
+# 只打开到 dev 的路径（逐级解锁）
+!content/developer
+content/developer/*
+
+!content/developer/dev
+!content/developer/dev/**
+
+!.gitignore
 
 
 

@@ -54,3 +54,130 @@
 
 目录功能，要传递目录给别的components
 
+
+# 0422
+
+我们来优化markdown解析器。
+
+1. 代码块
+- 加入代码高亮
+- 代码块右上角有两个按钮，都是icon，从左到右：折行显示，复制
+- 代码块左上角显示代码类型
+
+2. 配置
+md.config.ts里包含了categories信息，其中一些看起来更适合放在site.config.ts中，保证功能不变的前提下解耦一下
+
+---
+
+功能完美实现了！我们来调整一下UI：
+1. 代码块和header圆角不一致
+2. header颜色和代码块一致吧，可以直接让header透明，而且高度调低点
+3. 深色模式下，代码块的宽度似乎变小了，这应该是某层div导致的
+4. header左上角不放东西了，代码类型的显示改到右上角折行按钮一边，而且不强制大写
+核心设计目标是让header不那么显眼
+
+---
+
+这回好多了，但是没有解决宽度问题。我发现本质是显示代码的div似乎是在一个更大的div上面，而显示代码的部分和它的parent的颜色不一样。我希望整个代码显示组件都保持一个颜色，这个颜色和代码高亮主题可以在md.config.ts中配置
+
+---
+
+边框问题似乎暂时解决了，然而只要背景色换成383838之外的颜色，就又变成原来大框套小框的样子而且按钮都没了。
+
+我觉得这种“加载时注入css和新的控件”的方法本身就容易出bug，不如让markdown渲染器渲染的时候就完成所有工作。
+
+按钮
+1. 点击复制按钮后，复制成功了，按钮会变成对钩icon，指针移动走之后变回复制icon
+2. 当代码很长向右划动时，按钮也跟着划动了，预期效果是按钮不会动
+3. 按钮所在的header还是太高了，导致代码块控件很大，代码到边框的宽度过长
+
+高亮
+1. 深色模式和浅色模式可以选择不同的css主题
+2. 如果不依赖cdn，我把这些css全都放到某处，在mdconfig中指定位置，如果找不到才用cdn
+3. 这些css对shell的高亮非常差，我看仓库里它们都是几年前更新的了，有没有更现代的选择。
+
+---
+
+我通过网页检查器注意到，代码块的margin和border之间在上下方向上出现了一个空隙。而且我希望按钮不要有自己的背景，也不要hover。整个代码块组件描述如下：
+从上到下：
+- 右对齐：代码类型，按钮。高度大约为1.5行文字
+- 代码内容
+- 划动时会出现的条
+整个组件看起来应该是一体的。
+
+另外，shiki没有生效。我觉得为了便于分析，不如在lib/markdown中分出来一个ts文件负责代码块渲染。
+
+---
+
+现在代码高亮的实现有问题，预想中应该是
+- 渲染markdown时，lib/markdown/index调用highlight来渲染代码块组件
+- 使用shiki处理高亮，主题在md.config.ts中配置
+
+但有以下问题：
+- 代码块的背景色现在就是网站背景色，且浅色模式下代码是浅灰白色
+- shiki未生效，现在没有任何高亮
+
+---
+
+这回效果真不错！我们做一些UI上的小调整
+1. 保护区
+代码现在几乎填满代码块组件，应该有一些保护区域，包括左右的空隙以及下边的划动条预留区域
+
+2. 按钮所在的header行
+- 应该单独有高度，而非和代码重叠
+- 按钮左边的label现在只显示TEXT，应该显示代码类型，且不强制大写
+
+---
+
+按钮部分不应该是个单独的div，它应该在pre中，也不应该有自己的背景色。而且底部的滚动条现在好像有两套实现。
+
+一个示例代码块组件如下，可以参考
+
+```html
+<div class="docx-code-block-container">
+    <div class="docx-code-block-inner-container">
+        <div class="code-block-resize">
+            <div class="resizable-wrapper" contenteditable="false">
+                <div class="editor-kit-code-block code-block code-fold-block is-safari" spellcheck="false">
+                    <div contenteditable="false" class="ignore-dom">
+                        <div contenteditable="false" class="code-block-header uneditable">
+                            <div class="code-block-caption">
+                                <div class="caption-editor-area extra_edit_element" data-autoselect="false" style="">
+                                    <div class="zone-container editor-kit-container caption-editor code-block-caption-editor notranslate safari"
+                                        data-zone-id="0" data-zone-container="*" data-slate-editor="true"
+                                        contenteditable="false" style="text-align: left;">
+                                        <div class="ace-line" data-node="true" dir="auto"><span data-string="true"
+                                                data-leaf="true">代码块</span><span data-string="true" data-enter="true"
+                                                data-leaf="true">​</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="code-block-header-toolbar"><span class="code-block-header-btn-con"><button
+                                        class="code-block-header-btn code-block-header-btn-disable" type="button"><span
+                                            style="max-width: 53em;">Plain Text</span></button></span><button
+                                    type="button"
+                                    class="ud__button ud__button--link ud__button--link-default ud__button--size-md code-copy ghost-btn"><svg
+                                        width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M6.188 8.25v8.25h6.875V8.25H6.186zm8.25-.688v9.702c0 .337-.288.611-.642.611H5.454c-.354 0-.641-.274-.641-.611V7.486c0-.337.287-.611.641-.611h8.296c.38 0 .688.308.688.688zm2.548-3.236a.685.685 0 01.201.487v8.593c0 .19-.153.344-.343.344h-.688a.344.344 0 01-.343-.344V5.5H9.28a.344.344 0 01-.344-.344V4.47c0-.19.154-.344.344-.344H16.5c.19 0 .362.077.486.201z"
+                                            fill="#646A73"></path>
+                                    </svg><span>复制</span></button></div>
+                        </div>
+                    </div>
+                    <div class="code-block-content code-wrap-content">
+                        <div class="code-block-line" contenteditable="false"></div>
+                        <div class="zone-container text-editor hide-placeholder code-block-zone-container"
+                            data-zone-id="135" data-zone-container="*" data-slate-editor="true" contenteditable="false">
+                            <div class="ace-line" data-node="true" dir="auto">
+                                <div class="code-line-wrapper" data-line-num="1"><span data-string="true"
+                                        data-enter="true" data-leaf="true">​</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+```
+

@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPostBySlug } from '@/lib/markdown';
+import MarkdownEnhancer from '@/components/shared/MarkdownEnhancer';
+
+import { mdConfig } from '@/md.config';
 
 // 1. 构建时生成所有可能的路由路径
 export async function generateStaticParams() {
@@ -50,8 +53,7 @@ export default async function ContentPage({
         ))}
       </div>
 
-      {/* 页面内容区 */}
-      <div className="prose prose-blue dark:prose-invert max-w-none">
+      <div className="prose prose-blue dark:prose-invert max-w-none prose-pre:m-0 prose-pre:p-0 prose-pre:bg-transparent">
         <h1 className="text-4xl font-extrabold mb-6 text-gray-900 dark:text-gray-100 leading-tight">
           {meta.title}
         </h1>
@@ -62,6 +64,8 @@ export default async function ContentPage({
           </span>
         </div>
         
+        <MarkdownEnhancer />
+
         {/* 渲染真实的 Markdown 内容 */}
         <div 
           className="text-gray-800 dark:text-gray-200 leading-relaxed space-y-4"

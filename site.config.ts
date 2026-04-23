@@ -10,6 +10,35 @@ export const siteConfig = {
     { "title": "Tags", "href": "/tags" }
   ],
   "footerText": "© 2025-2026 Anpoliros",  
+  
+  // Category 配置（用于在分类页面展示横幅和说明）
+  categories: {
+    walking: {
+      name: "行走",
+      description: "",
+      image: "/images/neko_over_un.jpeg", // 可自定义替换为你想展示的横幅图绝对路径
+      showImage: true // 配置横幅开关
+    },
+    speaking: {
+      name: "言论",
+      description: "123",
+      image: "/images/re/nisemono/nisemono-1.jpg",
+      showImage: true
+    },
+    hardware: {
+      name: "硬件",
+      description: "",
+      image: "/images/ThinkPad/x250-0.jpeg",
+      showImage: true
+    },
+    developer: {
+      name: "开发",
+      description: "",
+      image: "/images/lab/lab1/1-1-1.jpeg", // 测试调用一张存在的图片
+      showImage: true
+    }
+  } as Record<string, { name: string; description: string; image: string; showImage: boolean }>,
+
   layout: {
     // 左右分界线的比例，支持CSS网格比例例如 '60% 1fr' or 'minmax(600px, 2fr) 1fr'
     gridTemplateColumns: "70% 1fr",

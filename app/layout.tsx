@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { siteConfig } from "@/site.config";
+import { mdConfig } from "@/md.config";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({

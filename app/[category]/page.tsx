@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/markdown";
 import { mdConfig } from "@/md.config";
 import Image from "next/image";
+import { siteConfig } from '@/site.config';
 
 // 1. 获取所有的 Category，生成静态页面
 export async function generateStaticParams() {
@@ -26,19 +27,23 @@ export default async function CategoryPage({
     .filter((post) => post.category === category)
     .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
 
-  if (categoryPosts.length === 0 && (!mdConfig.categories || !(category in mdConfig.categories))) {
+  if (categoryPosts.length === 0 && (!siteConfig.categories || !(category in siteConfig.categories))) {
     notFound();
   }
 
+  // 获取分类信息（如果在配置中存在）
+  const info = siteConfig.categories && category in siteConfig.categories
+    ? siteConfig.categories[category as keyof typeof siteConfig.categories]
+    : null;
+
   // 获取配置中的信息（无配置兜底为默认显示）
-  const info = mdConfig.categories && category in mdConfig.categories
-    ? mdConfig.categories[category]
-    : {
-        name: category.toUpperCase(),
-        description: `分类 ${category} 下的所有文章`,
-        showImage: false,
-        image: ""
-      };
+  const fallbackInfo = {
+    name: category.toUpperCase(),
+    description: `分类 ${category} 下的所有文章`,
+    showImage: false,
+    image: ""
+  };
+  const displayInfo = info || fallbackInfo;
 
   // 映射为 ArticleList 入参类型
   const articles: Article[] = categoryPosts.map((post) => ({
@@ -53,25 +58,25 @@ export default async function CategoryPage({
   return (
     <div className="flex flex-col">
       {/* 长条形图片 Banner */}
-      {info.showImage && info.image ? (
+      {displayInfo.showImage && displayInfo.image ? (
         <div className="w-full h-48 bg-blue-100 dark:bg-blue-900 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
-          <Image src={info.image} alt={info.name} fill className="object-cover" />
+          <Image src={displayInfo.image} alt={displayInfo.name} fill className="object-cover" />
           <div className="absolute inset-0 bg-blue-900/40 dark:bg-blue-950/60 z-10 "></div>
           <h1 className="text-3xl font-bold text-white z-20 relative">
-            📂 {info.name}
+            📂 {displayInfo.name}
           </h1>
         </div>
       ) : (
         <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 z-10 relative">
-            📂 {info.name}
+            📂 {displayInfo.name}
           </h1>
         </div>
       )}
       
       {/* Category 简介 */}
       <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
-        <p>{info.description}</p>
+        <p>{displayInfo.description}</p>
       </div>
 
       {/* 文章列表 */}

@@ -5,6 +5,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
+import { applyHighlight } from './highlight';
 import { mdConfig } from '@/md.config';
 
 export interface PostMeta {
@@ -98,9 +99,15 @@ export async function getPostBySlug(category: string, slug: string) {
   const { data, content } = matter(rawContent);
 
   // Markdown -> HTML AST -> HTML String
-  const file = await unified()
+  const processor = unified()
     .use(remarkParse)
-    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(remarkRehype, { allowDangerousHtml: true });
+
+  if (mdConfig.features.enableHighlight) {
+    applyHighlight(processor);
+  }
+
+  const file = await processor
     .use(rehypeStringify, { allowDangerousHtml: true })
     .process(content);
 
