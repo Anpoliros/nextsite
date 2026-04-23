@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "npm run build && nohup next start -p 12121 > /tmp/next.log 2>&1 &",
+    "deploy": "npm run build && nohup next start -p 12121 > public/next.log 2>&1 &",
     "lint": "eslint"
   },
   "dependencies": {

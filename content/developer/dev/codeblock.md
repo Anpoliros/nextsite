@@ -16,6 +16,11 @@ tags: ["dev", "typescript"]
 sudo /Applications/Install\ macOS\ Mojave.app/Contents/Resources/createinstallmedia --volume /Volumes/p1
 ```
 
+无语种代码
+```
+hello
+```
+
 长代码
 ```java
 @Override

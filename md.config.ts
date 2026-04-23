@@ -20,5 +20,9 @@ export const mdConfig = {
     // https://shiki.style/themes
     codeThemeLight: "monokai",
     codeThemeDark: "github-dark",
+    
+    // 代码块 header 的背景颜色（可自定义）
+    codeHeaderBgLight: "white",
+    codeHeaderBgDark: "transparent",
   }
 };

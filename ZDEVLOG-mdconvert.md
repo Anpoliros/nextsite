@@ -131,8 +131,36 @@ md.config.ts里包含了categories信息，其中一些看起来更适合放在s
 
 按钮部分不应该是个单独的div，它应该在pre中，也不应该有自己的背景色。而且底部的滚动条现在好像有两套实现。
 
-一个示例代码块组件如下，可以参考
 
+我们来优化下代码块渲染。逻辑是lib/markdown中实现markdown解析器，其中的index.ts负责渲染，调用highlight.ts。采用shiki做代码高亮。代码块右上角有折行和复制按钮。
+现在已经实现了基本功能，然而现在：
+- 代码内容和代码块边框之间没有缓冲区，文字过于贴近边框
+- header和代码块不是在一个div中
+- 无法正确加载代码类型（例如shell、py）
+
+如下是我想要实现的html效果的示例
+```html
+<div class="pre">
+    <div header，可在md.config.ts中分别定义深色浅色模式下的颜色，默认透明>
+        <div class="button" 右对齐>
+            <label>代码类型，需要动态获取</label>
+            <button>折行按钮</button>
+            <button>复制按钮</button>
+        </div>
+    </div>
+    <div 代码container>
+        <div 代码区，和container间有空隙>
+            <span>...</span>
+        </div>
+    </div>
+</div>
+```
+
+首先你需要把highlight.ts改名为codeblock.ts，更加直观，然后做上述改动。如果要做测试看效果，访问localhost:3000/developer/codeblock
+
+
+
+如下是飞书文档的代码块实现，我们不需要这么精细的实现，但可以参考
 ```html
 <div class="docx-code-block-container">
     <div class="docx-code-block-inner-container">
@@ -180,4 +208,32 @@ md.config.ts里包含了categories信息，其中一些看起来更适合放在s
     </div>
 </div>
 ```
+
+---
+
+效果还不错！有两个小问题
+1. 代码类型不要强制大写
+2. shiki主题的背景颜色不生效了，现在代码块的背景直接继承了网页背景色
+
+---
+
+我们来优化下代码块渲染。逻辑是lib/markdown中实现markdown解析器，其中的index.ts负责渲染，调用codeblock.ts。采用shiki做代码高亮。代码块右上角有折行和复制按钮。现在已经实现了基本功能，然而：
+1. 代码块的背景颜色是网页背景色，预期应该用shiki主题的背景色
+2. 如果代码块没有指定语言，例如
+```
+hello 
+```
+则会报错。预期没有指定时代码类型label将什么都不显示
+3. 按钮不要“折行”“复制”的文字
+
+测试页面localhost:3000/developer/codeblock
+
+---
+
+1. 代码块UI
+现在出现了代码块套着代码块的奇怪景象
+
+2. 背景色
+有语种代码的背景色正常了，但无语种代码的背景色仍然不能正常显示
+
 

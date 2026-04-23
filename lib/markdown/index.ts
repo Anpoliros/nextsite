@@ -5,7 +5,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
-import { applyHighlight } from './highlight';
+import { applyHighlight } from './codeblock';
 import { mdConfig } from '@/md.config';
 
 export interface PostMeta {

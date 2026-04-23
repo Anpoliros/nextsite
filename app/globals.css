@@ -10,14 +10,16 @@ body {
 }
 
 /* Ensure shiki background color overrides typography plugin */
-pre {
-  background-color: var(--shiki-light-bg, var(--shiki-default-bg, #f6f8fa)) !important;
-  color: var(--shiki-light, var(--shiki-default, #24292e)) !important;
+figure[data-rehype-pretty-code-figure], figure:has(pre[data-processed]) {
+  color: var(--shiki-light, var(--shiki-default, #24292e));
 }
 
-.dark pre {
-  background-color: var(--shiki-dark-bg, var(--shiki-default-bg, #24292e)) !important;
-  color: var(--shiki-dark, var(--shiki-default, #e1e4e8)) !important;
+.dark figure[data-rehype-pretty-code-figure], .dark figure:has(pre[data-processed]) {
+  color: var(--shiki-dark, var(--shiki-default, #e1e4e8));
+}
+
+pre {
+  background-color: transparent !important;
 }
 
 code span {
