@@ -167,7 +167,64 @@ about的链接由hero中的subtitle给出。
 
 
 
-# 0422
 
-文章页面的tag应该可点击
-category和tag放到一处，而且顶部和底部都有
+# 0424
+
+
+我们来讨论一下ArticleList翻页的实现。现在它的长度是无限的，我希望将其控制在一个可以调节的数量，但感觉有两种技术路线：
+1. 翻页后到达新的页面路由，例如xxx/page/2
+2. 翻页只是ArticleList组件内的行为，点击按钮后并不路由到新的页面
+你建议怎么做，还有没有别的实现方式
+
+我们来优化一下ArticleList的实现。
+
+---
+
+那不同页面url格式应该怎么安排呢？是这样：
+- example.com/page/2
+- example.com/hardware/page/2
+还是
+- example.com/hardware?page=2
+你觉得哪种更好一些呢
+
+---
+
+那我们就用查询参数的方式。现在开始工程吧，需求如下：
+
+1. 列表长度 
+列表长度应该有一个可调的上限，比如最多容纳10篇文章，超过了就分页。这个参数暂时在site.config.ts中控制，让所有页面的行为一致，后续可以考虑更灵活的配置。
+
+2. footer
+控制翻页行为的footer整体上是相对于文章列表的div居中的，从左到右是：
+- 上一页
+- 页面数
+    - 最多有5个数字，例如在第二页，显示12345；在第四页，显示23456
+    - 会对当前所在的页面做标记，例如在第二页，则数字2下面会有一个点
+- 下一页
+
+---
+
+我们来优化npm run deploy的行为。现在它无法终止上一次部署的服务器，而且log也不够丰富。
+
+我的想法是在deploy目录中写一个脚本，这个脚本会杀掉正在占用12121端口的进程（我确定它就是上一个版本的npm start服务器），并且还会创建新的log名字，例如build_260423_184833.log，放到deploy目录中。
+
+但我感觉这样不太正规，而且发现npm run start -- -p 12121产生的log似乎没有记录发往服务器的请求，然而npm run dev却能记录。而如果生产服务器能记录日志，感觉非常容易爆掉弄出几万行的日志，还得弄日志轮换。说说你的建议
+
+---
+
+功能实现的很好，但我部署之后开了网页检查器后在“来源”中发现很多碎片文件，名字是似乎和header中的类型和"tags"有关。随着时间增加，还出现了更多名字为"/"的文件。他们都很短，内容形如：
+```
+1:"$Sreact.fragment"
+2:I[97367,["/_next/static/chunks/0~9lxh6_yym3h.js","/_next/static/chunks/0d3shmwh5_nmn.js"],"ViewportBoundary"]
+4:I[97367,["/_next/static/chunks/0~9lxh6_yym3h.js","/_next/static/chunks/0d3shmwh5_nmn.js"],"MetadataBoundary"]
+5:"$Sreact.suspense"
+0:{"f":[[["",{"children":[["category","hardware","d",null],{"children":["__PAGE__",{}]}]},"$undefined","$undefined",16],null,["$","$1","h",{"children":[null,["$","$L2","qoaTBjr3jKoJn5kNs60hlv",{"children":"$L3"}],["$","div","qoaTBjr3jKoJn5kNs60hlm",{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$L6"}]}]}]]}],false]],"q":"","i":false,"S":false,"h":null,"b":"pN02MT9Cousizo5gYACR3"}
+3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+7:I[27201,["/_next/static/chunks/0~9lxh6_yym3h.js","/_next/static/chunks/0d3shmwh5_nmn.js"],"IconMark"]
+6:[["$","title","0",{"children":"Anpoliros"}],["$","meta","1",{"name":"description","content":"Hello from Shanghai"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.0vwb_grk5.3_..ico","sizes":"64x59","type":"image/x-icon"}],["$","$L7","3",{}]]
+```
+```
+0:{"f":[[["",{"children":["__PAGE__",{}]},"$undefined","$undefined",16],null,[null,null],true]],"q":"?page=3","i":false,"S":false,"h":null,"b":"pN02MT9Cousizo5gYACR3"}
+```
+
+这和参数查询有关系吗？如果没有关系，另一个变量是我刚才从npm run start的方式改为了用pm管理。

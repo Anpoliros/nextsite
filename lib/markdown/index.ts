@@ -103,6 +103,7 @@ export async function getPostBySlug(category: string, slug: string) {
     .use(remarkParse)
     .use(remarkRehype, { allowDangerousHtml: true });
 
+  // 调用codeblock，渲染代码块组件并高亮
   if (mdConfig.features.enableHighlight) {
     applyHighlight(processor);
   }

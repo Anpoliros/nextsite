@@ -58,7 +58,7 @@ export const siteConfig = {
     },
     // Hero 文本颜色控制
     heroColors: {
-      title: "text-black dark:text-white",
+      title: "text-lime-300 dark:text-white",
       subtitle: "text-gray-500 dark:text-gray-300",
     },
     // 网站主题基础颜色：在这里直接定义 Hex / RGB 颜色值
@@ -86,5 +86,11 @@ export const siteConfig = {
   // 置顶文章
   pinnedArticles: [
     "speaking/freedom", // 可以加入你实际的文章slug，比如 'walking/hello' 等
-  ]
+  ],
+  
+  // 分页设置
+  pagination: {
+    articlesPerPage: 10,
+    prefetch: true // 控制是否在视口中自动预取翻页的数据
+  }
 };

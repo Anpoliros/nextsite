@@ -1,4 +1,5 @@
 import ArticleList, { Article } from "@/components/shared/ArticleList";
+import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/markdown";
 
@@ -17,12 +18,16 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function TagPage({
-  params,
-}: {
+import { siteConfig } from "@/site.config";
+
+export default async function TagPage(props: {
   params: Promise<{ tag: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { tag } = await params;
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const tag = params.tag;
+  const page = parseInt(searchParams?.page || "1", 10);
   const decodedTag = decodeURIComponent(tag);
 
   // 查找包含该标签的全部文章，并按时间降序
@@ -36,7 +41,7 @@ export default async function TagPage({
   }
 
   // 映射为 ArticleList 入参类型
-  const articles: Article[] = taggedPosts.map((post) => ({
+  const allArticles: Article[] = taggedPosts.map((post) => ({
     id: `${post.category}/${post.slug}`,
     title: post.meta.title || post.slug,
     excerpt: post.excerpt || "暂无简介",
@@ -44,6 +49,12 @@ export default async function TagPage({
     category: post.category,
     tags: post.meta.tags,
   }));
+
+  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const totalPages = Math.ceil(allArticles.length / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const articles = allArticles.slice(startIndex, endIndex);
 
   return (
     <div className="flex flex-col">
@@ -58,7 +69,8 @@ export default async function TagPage({
       </div>
 
       <div className="pl-6 relative">
-        <ArticleList articles={articles} title={`共 ${articles.length} 篇文章`} />
+        <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
+        <Pagination totalPages={totalPages} currentPage={page} basePath={`/tags/${tag}`} />
       </div>
     </div>
   );

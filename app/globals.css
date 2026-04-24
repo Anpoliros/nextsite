@@ -18,6 +18,7 @@ figure[data-rehype-pretty-code-figure], figure:has(pre[data-processed]) {
   color: var(--shiki-dark, var(--shiki-default, #e1e4e8));
 }
 
+/*代码块组件*/
 pre {
   background-color: transparent !important;
 }

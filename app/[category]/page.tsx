@@ -1,4 +1,5 @@
 import ArticleList, { Article } from "@/components/shared/ArticleList";
+import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/markdown";
 import { mdConfig } from "@/md.config";
@@ -14,12 +15,15 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function CategoryPage({
-  params,
-}: {
+export default async function CategoryPage(props: {
   params: Promise<{ category: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { category } = await params;
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const category = params.category;
+  
+  const page = parseInt(searchParams?.page || "1", 10);
   
   // 查找对应分类的全部文章，并按时间降序
   const allPosts = getAllPosts();
@@ -46,7 +50,7 @@ export default async function CategoryPage({
   const displayInfo = info || fallbackInfo;
 
   // 映射为 ArticleList 入参类型
-  const articles: Article[] = categoryPosts.map((post) => ({
+  const allArticles: Article[] = categoryPosts.map((post) => ({
     id: `${post.category}/${post.slug}`,
     title: post.meta.title || post.slug,
     excerpt: post.excerpt || "暂无简介",
@@ -54,6 +58,12 @@ export default async function CategoryPage({
     category: post.category,
     tags: post.meta.tags,
   }));
+
+  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const totalPages = Math.ceil(allArticles.length / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const articles = allArticles.slice(startIndex, endIndex);
 
   return (
     <div className="flex flex-col">
@@ -81,8 +91,11 @@ export default async function CategoryPage({
 
       {/* 文章列表 */}
       <div className="pl-6 relative">
-        {articles.length > 0 ? (
-          <ArticleList articles={articles} title={`共 ${articles.length} 篇文章`} />
+        {allArticles.length > 0 ? (
+          <>
+            <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
+            <Pagination totalPages={totalPages} currentPage={page} basePath={`/${category}`} />
+          </>
         ) : (
           <p className="text-gray-500">此分类下暂无内容。</p>
         )}

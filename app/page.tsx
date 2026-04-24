@@ -1,9 +1,13 @@
 import Hero from "@/components/home/Hero";
 import ArticleList, { Article } from "@/components/shared/ArticleList";
+import Pagination from "@/components/shared/Pagination";
 import { getAllPosts } from "@/lib/markdown";
 import { siteConfig } from "@/site.config";
 
-export default async function Home() {
+export default async function Home(props: { searchParams: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams;
+  const page = parseInt(searchParams?.page || "1", 10);
+  
   const allPosts = getAllPosts();
   
   // Sort by date descending
@@ -19,14 +23,18 @@ export default async function Home() {
     tags: post.meta.tags || [],
   }));
 
-  // Identify Pinned Articles
+  // 置顶文章
   const pinnedSlugs = siteConfig.pinnedArticles || [];
   const pinnedArticles = mappedPosts.filter(post => 
     pinnedSlugs.includes(post.id)
   );
 
-  // Timeline Articles (all others, or just all depending on preference, we'll exclude pinned ones from timeline to avoid duplication, or keep them if better, let's keep them in timeline too for completeness)
-  const timelineArticles = mappedPosts;
+  // 文章时间线，目前是保留了pinned的文章，也可以考虑不保留以避免重复
+  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const totalPages = Math.ceil(mappedPosts.length / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const timelineArticles = mappedPosts.slice(startIndex, endIndex);
 
   return (
     <div className="flex flex-col w-full">
@@ -53,15 +61,8 @@ export default async function Home() {
           <ArticleList articles={timelineArticles} />
         </div>
 
-        {/* 翻页按钮 (后续可以做真实的分页组件) */}
-        <div className="mt-8 flex justify-center gap-4">
-          <button className="rounded-md bg-gray-100 px-6 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-            上一页
-          </button>
-          <button className="rounded-md bg-gray-900 dark:bg-gray-100 px-6 py-2 text-sm font-medium text-white dark:text-gray-900 transition hover:bg-gray-800 dark:hover:bg-white">
-            下一页
-          </button>
-        </div>
+        {/* 翻页按钮 */}
+        <Pagination totalPages={totalPages} currentPage={page} basePath="/" />
       </div>
     </div>
   );
