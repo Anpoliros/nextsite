@@ -3,6 +3,12 @@
 ## 项目说明
 这个项目是一个基于next.js的个人网站。
 
+- app/ 页面
+- components/ 组件
+- lib/
+    - markdown/ 渲染
+- node_modules/next/dist/docs/ 框架文档
+
 ## 代码编写要求
 你在编写和重构时需要遵循以下要求：
 
