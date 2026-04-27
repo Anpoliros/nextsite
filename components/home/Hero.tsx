@@ -15,14 +15,13 @@ export default function Hero() {
         style={{ backgroundImage: `url('${siteConfig.ui.heroImages.light}')` }}
       ></div>
       
-      {/* 半透明遮罩确保文字可读 */}
       <div className=""></div>
 
       <div className="relative z-10 px-4">
         <h1 className={`${siteConfig.ui.fontSizes.heroTitle} ${siteConfig.ui.heroColors.title} font-bold mb-4 tracking-tight`}>
           {siteConfig.description}
         </h1>
-        <Link href="/walking/about" className={`${siteConfig.ui.fontSizes.heroSubtitle} ${siteConfig.ui.heroColors.subtitle} transition-colors underline underline-offset-4 decoration-gray-400 hover:decoration-white font-medium block`}>
+        <Link href="/about" className={`${siteConfig.ui.fontSizes.heroSubtitle} ${siteConfig.ui.heroColors.subtitle} transition-colors underline underline-offset-4 decoration-gray-400 hover:decoration-white font-medium block`}>
           About
         </Link>
       </div>

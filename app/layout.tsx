@@ -44,14 +44,10 @@ export default function RootLayout({
               --site-bg: ${siteConfig.ui.themeColors.dark.background};
               --site-text: ${siteConfig.ui.themeColors.dark.text};
             }
-            body {
-              background-color: var(--site-bg);
-              color: var(--site-text);
-            }
           `
         }} />
       </head>
-      <body className={`min-h-full flex flex-col transition-colors duration-300`}>
+      <body className={`min-h-full flex flex-col transition-colors duration-300 bg-[var(--site-bg)] text-[var(--site-text)]`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className={`${siteConfig.layout.mainContainer} flex-1 flex justify-start`}>

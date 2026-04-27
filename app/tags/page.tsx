@@ -38,7 +38,7 @@ export default function TagsPage() {
         {TagGroups.map((group) => (
           <section key={group.name}>
             <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block"></span>
+              <span className="w-1.5 h-6 bg-black-500 rounded-full inline-block"></span>
               {group.name}
             </h2>
             <div className="flex flex-wrap gap-3 pl-4">

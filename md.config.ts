@@ -18,7 +18,7 @@ export const mdConfig = {
     
     // rehype-pretty-code 提供的主题名称。采用 VS Code 的语法高亮设计。
     // https://shiki.style/themes
-    codeThemeLight: "min-light",
+    codeThemeLight: "everforest-light",
     codeThemeDark: "github-dark",
     
     // 代码块 header 的背景颜色（可自定义）

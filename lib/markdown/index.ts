@@ -43,7 +43,14 @@ export function getAllPosts() {
   const contentDir = mdConfig.contentDir;
   const files = getFilesRecursively(contentDir);
 
-  const posts = files.map((filePath) => {
+  const posts = files
+    .filter((filePath) => {
+      // 过滤掉直接放在 content 根目录下的 .md 文件（例如 about.md）
+      // 只有包含子目录的才被视为正规 category 文章
+      const relativePath = path.relative(contentDir, filePath);
+      return relativePath.includes(path.sep);
+    })
+    .map((filePath) => {
     const rawContent = fs.readFileSync(filePath, 'utf-8');
     const { data, content } = matter(rawContent);
 
@@ -114,6 +121,44 @@ export async function getPostBySlug(category: string, slug: string) {
 
   return {
     meta: post.meta,
+    content: String(file),
+  };
+}
+
+/**
+ * 根据相对路径读取并解析单篇 Markdown 文件
+ * 例如读取 "about.md" -> content/about.md
+ */
+export async function getSinglePostContent(relativePath: string) {
+  const targetPath = path.join(mdConfig.contentDir, relativePath);
+  
+  if (!fs.existsSync(targetPath)) {
+    return null;
+  }
+
+  const rawContent = fs.readFileSync(targetPath, 'utf-8');
+  const { data, content } = matter(rawContent);
+
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkRehype, { allowDangerousHtml: true });
+
+  if (mdConfig.features.enableHighlight) {
+    applyHighlight(processor);
+  }
+
+  const file = await processor
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .process(content);
+
+  return {
+    meta: {
+      title: data.title || '',
+      date: data.date ? new Date(data.date).toISOString() : '',
+      categories: data.categories || [],
+      tags: data.tags || [],
+      slug: path.basename(relativePath, '.md')
+    } as PostMeta,
     content: String(file),
   };
 }

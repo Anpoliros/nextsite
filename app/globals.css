@@ -9,7 +9,15 @@ body {
   /* Tailwind 的 utilities 已经接管了背景和色彩 */
 }
 
-/* Ensure shiki background color overrides typography plugin */
+
+
+
+
+
+/* ---- shiki上色 ---- */
+
+/*figure背景采用shiki主题背景色，覆写tailwind/typography的默认颜色；
+@tailwindcss/typography 插件会自动把 <pre> 和 <code> 染成默认的深灰色背景和白色文字*/
 figure[data-rehype-pretty-code-figure], figure:has(pre[data-processed]) {
   color: var(--shiki-light, var(--shiki-default, #24292e));
 }
@@ -18,15 +26,42 @@ figure[data-rehype-pretty-code-figure], figure:has(pre[data-processed]) {
   color: var(--shiki-dark, var(--shiki-default, #e1e4e8));
 }
 
-/*代码块组件*/
+/*代码块组件，设置为透明，同样覆写tailwind/typography的默认颜色*/
 pre {
   background-color: transparent !important;
 }
 
+/*代码token单元，fallback：继承父元素*/
 code span {
   color: var(--shiki-light, inherit);
 }
 
 .dark code span {
   color: var(--shiki-dark, inherit);
+}
+
+
+
+
+
+
+
+/* ---- 代码块组件样式 ---- */
+
+@layer components {
+  .code-block-figure {
+    @apply relative rounded-xl overflow-hidden my-6 border border-gray-200 dark:border-white/10 flex flex-col bg-[var(--shiki-light-bg,var(--shiki-default-bg,#f9fafb))] dark:bg-[var(--shiki-dark-bg,var(--shiki-default-bg,#1f2937))];
+  }
+  
+  .code-block-header {
+    @apply flex items-center justify-end px-4 py-2 border-b border-gray-200/50 dark:border-white/5 text-xs text-gray-400 z-10;
+  }
+  
+  .code-block-container {
+    @apply p-2 overflow-x-auto;
+  }
+  
+  .code-block-pre {
+    @apply px-4 pt-0 pb-5 text-sm leading-relaxed bg-transparent! w-fit min-w-full;
+  }
 }
