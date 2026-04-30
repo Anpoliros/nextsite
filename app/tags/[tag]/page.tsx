@@ -1,24 +1,13 @@
 import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
-import { getAllPosts } from "@/lib/markdown";
-
-// 1. 获取所有的 Tag，生成静态页面
-export async function generateStaticParams() {
-  const posts = getAllPosts();
-  const tags = new Set<string>();
-  
-  posts.forEach(post => {
-    const postTags = post.meta.tags || [];
-    postTags.forEach(tag => tags.add(tag));
-  });
-
-  return Array.from(tags).map((tag) => ({
-    tag,
-  }));
-}
-
+import { getAllPosts } from "@/lib/posts/getposts";
 import { siteConfig } from "@/site.config";
+
+export async function generateStaticParams() {
+  const { tags } = getAllPosts();
+  return tags.map(tag => ({ tag }));
+}
 
 export default async function TagPage(props: {
   params: Promise<{ tag: string }>;
@@ -30,24 +19,22 @@ export default async function TagPage(props: {
   const page = parseInt(searchParams?.page || "1", 10);
   const decodedTag = decodeURIComponent(tag);
 
-  // 查找包含该标签的全部文章，并按时间降序
-  const allPosts = getAllPosts();
-  const taggedPosts = allPosts
-    .filter((post) => post.meta.tags && post.meta.tags.includes(decodedTag))
-    .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
+  const { posts } = getAllPosts();
+  const taggedPosts = posts
+    .filter(post => post.post_tag.includes(decodedTag))
+    .sort((a, b) => b.post_timestamp - a.post_timestamp);
 
   if (taggedPosts.length === 0) {
     notFound();
   }
 
-  // 映射为 ArticleList 入参类型
-  const allArticles: Article[] = taggedPosts.map((post) => ({
-    id: `${post.category}/${post.slug}`,
-    title: post.meta.title || post.slug,
-    excerpt: post.excerpt || "暂无简介",
-    date: post.meta.date ? new Date(post.meta.date).toLocaleDateString() : "",
-    category: post.category,
-    tags: post.meta.tags,
+  const allArticles: Article[] = taggedPosts.map(post => ({
+    id: post.post_path.slice(1),
+    title: post.post_title,
+    excerpt: "暂无简介",
+    date: post.post_datetime,
+    category: post.post_category,
+    tags: post.post_tag,
   }));
 
   const limit = siteConfig.pagination?.articlesPerPage || 10;
@@ -63,7 +50,7 @@ export default async function TagPage(props: {
           🏷️ #{decodedTag}
         </h1>
       </div>
-      
+
       <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
         <p>包含标签 <strong>{decodedTag}</strong> 的所有文章</p>
       </div>

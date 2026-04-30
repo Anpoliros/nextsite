@@ -1,164 +1,50 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import rehypeStringify from 'rehype-stringify';
-import { applyHighlight } from './codeblock';
-import { mdConfig } from '@/md.config';
+import fs from 'fs'
+import path from 'path'
+import matter from 'gray-matter'
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import remarkRehype from 'remark-rehype'
+import rehypeStringify from 'rehype-stringify'
+import { applyHighlight } from './codeblock'
+import { applyTable } from './table'
+import { mdConfig } from '@/md.config'
 
-export interface PostMeta {
-  title: string;
-  date: string;
-  categories: string[];
-  tags: string[];
-  slug: string;
-}
-
-/**
- * 递归获取目录下所有的 .md 文件路径
- */
-function getFilesRecursively(dir: string): string[] {
-  let results: string[] = [];
-  const list = fs.readdirSync(dir);
-  
-  list.forEach((file) => {
-    const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
-    if (stat && stat.isDirectory()) {
-      results = results.concat(getFilesRecursively(filePath));
-    } else if (file.endsWith('.md')) {
-      results.push(filePath);
-    }
-  });
-
-  return results;
-}
-
-/**
- * 获取所有的文章信息，用于构建时生成路由
- */
-export function getAllPosts() {
-  const contentDir = mdConfig.contentDir;
-  const files = getFilesRecursively(contentDir);
-
-  const posts = files
-    .filter((filePath) => {
-      // 过滤掉直接放在 content 根目录下的 .md 文件（例如 about.md）
-      // 只有包含子目录的才被视为正规 category 文章
-      const relativePath = path.relative(contentDir, filePath);
-      return relativePath.includes(path.sep);
-    })
-    .map((filePath) => {
-    const rawContent = fs.readFileSync(filePath, 'utf-8');
-    const { data, content } = matter(rawContent);
-
-    // 计算 slug（取文件名，不含后缀）
-    const slug = path.basename(filePath, '.md');
-    
-    // 推导 category
-    const relativePath = path.relative(contentDir, filePath);
-    const category = relativePath.split(path.sep)[0];
-
-    // 简单提取摘要：找 `<!--more-->` 或取前段文字
-    let excerpt = '';
-    const moreIndex = content.indexOf('<!--more-->');
-    if (moreIndex !== -1) {
-      excerpt = content.slice(0, moreIndex).replace(/#+\s/g, '').replace(/\n/g, ' ').trim().slice(0, 150);
-    } else {
-      excerpt = content.slice(0, 150).replace(/#+\s/g, '').replace(/\n/g, ' ').trim();
-    }
-
-    // 清理一下 excerpt 中的 markdown 符号 (非常基础的正则，仅供参考)
-    excerpt += excerpt.length >= 150 ? '...' : '';
-
-    return {
-      slug,
-      category,
-      filePath,
-      excerpt,
-      meta: {
-        title: data.title || '',
-        date: data.date ? new Date(data.date).toISOString() : '',
-        categories: data.categories || [],
-        tags: data.tags || [],
-        slug
-      } as PostMeta
-    };
-  });
-
-  return posts;
-}
-
-/**
- * 根据 category 和 slug 读取并解析目标 Markdown 文件的正文
- */
-export async function getPostBySlug(category: string, slug: string) {
-  const posts = getAllPosts();
-  const post = posts.find((p) => p.category === category && p.slug === slug);
-
-  if (!post) {
-    return null;
-  }
-
-  const rawContent = fs.readFileSync(post.filePath, 'utf-8');
-  const { data, content } = matter(rawContent);
-
-  // Markdown -> HTML AST -> HTML String
+function buildProcessor() {
   const processor = unified()
     .use(remarkParse)
-    .use(remarkRehype, { allowDangerousHtml: true });
+    .use(remarkGfm)
+    .use(remarkRehype, { allowDangerousHtml: true })
 
-  // 调用codeblock，渲染代码块组件并高亮
   if (mdConfig.features.enableHighlight) {
-    applyHighlight(processor);
+    applyHighlight(processor)
   }
 
-  const file = await processor
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(content);
+  applyTable(processor)
 
-  return {
-    meta: post.meta,
-    content: String(file),
-  };
+  return processor.use(rehypeStringify, { allowDangerousHtml: true })
+}
+
+export async function renderMarkdownContent(content: string): Promise<string> {
+  const file = await buildProcessor().process(content)
+  return String(file)
 }
 
 /**
- * 根据相对路径读取并解析单篇 Markdown 文件
- * 例如读取 "about.md" -> content/about.md
+ * 读取 content/ 下的任意单文件并渲染（用于 about 等非索引页）
  */
 export async function getSinglePostContent(relativePath: string) {
-  const targetPath = path.join(mdConfig.contentDir, relativePath);
-  
+  const targetPath = path.join(mdConfig.contentDir, relativePath)
+
   if (!fs.existsSync(targetPath)) {
-    return null;
+    return null
   }
 
-  const rawContent = fs.readFileSync(targetPath, 'utf-8');
-  const { data, content } = matter(rawContent);
-
-  const processor = unified()
-    .use(remarkParse)
-    .use(remarkRehype, { allowDangerousHtml: true });
-
-  if (mdConfig.features.enableHighlight) {
-    applyHighlight(processor);
-  }
-
-  const file = await processor
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(content);
+  const { data, content } = matter(fs.readFileSync(targetPath, 'utf-8'))
+  const html = await renderMarkdownContent(content)
 
   return {
-    meta: {
-      title: data.title || '',
-      date: data.date ? new Date(data.date).toISOString() : '',
-      categories: data.categories || [],
-      tags: data.tags || [],
-      slug: path.basename(relativePath, '.md')
-    } as PostMeta,
-    content: String(file),
-  };
+    meta: { title: String(data.title ?? '') },
+    content: html,
+  }
 }

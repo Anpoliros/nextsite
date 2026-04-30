@@ -1,35 +1,29 @@
 import Hero from "@/components/home/Hero";
 import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
-import { getAllPosts } from "@/lib/markdown";
+import { getAllPosts } from "@/lib/posts/getposts";
 import { siteConfig } from "@/site.config";
 
 export default async function Home(props: { searchParams: Promise<{ page?: string }> }) {
   const searchParams = await props.searchParams;
   const page = parseInt(searchParams?.page || "1", 10);
-  
-  const allPosts = getAllPosts();
-  
-  // Sort by date descending
-  allPosts.sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
 
-  // Map to Article format
-  const mappedPosts: Article[] = allPosts.map(post => ({
-    id: `${post.category}/${post.slug}`,
-    title: post.meta.title || post.slug,
-    excerpt: post.excerpt || "暂无简介",
-    date: post.meta.date,
-    category: post.category,
-    tags: post.meta.tags || [],
+  const { posts } = getAllPosts();
+
+  const sortedPosts = [...posts].sort((a, b) => b.post_timestamp - a.post_timestamp);
+
+  const mappedPosts: Article[] = sortedPosts.map(post => ({
+    id: post.post_path.slice(1),
+    title: post.post_title,
+    excerpt: "暂无简介",
+    date: post.post_datetime,
+    category: post.post_category,
+    tags: post.post_tag,
   }));
 
-  // 置顶文章
   const pinnedSlugs = siteConfig.pinnedArticles || [];
-  const pinnedArticles = mappedPosts.filter(post => 
-    pinnedSlugs.includes(post.id)
-  );
+  const pinnedArticles = mappedPosts.filter(post => pinnedSlugs.includes(post.id));
 
-  // 文章时间线，目前是保留了pinned的文章，也可以考虑不保留以避免重复
   const limit = siteConfig.pagination?.articlesPerPage || 10;
   const totalPages = Math.ceil(mappedPosts.length / limit);
   const startIndex = (page - 1) * limit;

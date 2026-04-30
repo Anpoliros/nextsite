@@ -17,7 +17,8 @@ content/developer/*
 
 /.archive
 
-
+# dev index dumps
+/.logs
 
 # ----- default -----
 

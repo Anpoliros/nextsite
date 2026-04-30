@@ -1,16 +1,19 @@
-# nextsite
+---
+title: "nexsite devlog 1"
+date: 2026-04-30
+categories: ["developer"]
+tags: ["dev", "typescript"]
+---
 
-这是一个基于next.js的静态内容网站实现，主要设计逻辑暂时延续了hugo/PaperMod。
+# nextsite devlog 1
 
-虽然我没写过一行typescript，但我们可以科学地vibe coding。同时这也是个快速学习前端开发的契机。后续会添加越来越多的功能，锐意迭代中！
+<!--more-->
 
-## 启动
+到目前，nextsite的两个核心需求1）经典的带有自适应的博客前端以及2）通过md构建网站的能力都已经实现。
 
-```sh
-npm run deploy
-```
 
-## 项目结构
+
+## 总体架构
 
 ```sh
 .
@@ -37,10 +40,42 @@ npm run deploy
 └── ZDEVLOG                    # 提示词日志
 ```
 
-## 关键逻辑
+页面
+- 在app中实现，目录即路由
+- 调用components，加载各个组件
+- 调用lib/posts，扫描content目录中的文章，构造元数据
+- 调用lib/markdown，渲染文章为html
+
+配置
+- site.config.ts控制大多数行为，例如主页、导航栏、底栏等
+- md.config.ts控制md渲染的行为
+
+基础设施
+- cloudflare连接器暴露到公网，后续打算加nginx
 
 
 
+## app & components
+
+
+
+
+## lib/markdown
+
+
+
+
+## lib/posts
+
+
+
+
+## config
+
+
+
+
+## work with LLM
 
 
 

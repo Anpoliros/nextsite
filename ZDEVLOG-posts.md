@@ -63,7 +63,7 @@
 
 
 
-你需要在一个 Next.js（App Router）博客项目中实现一个“内容索引层”（content index layer），用于一次性扫描所有 posts（通常是 markdown / mdx 文件），构建统一的数据结构，并提供给全局复用。
+我们来重构网站的lib/markdown，实现一个“内容索引层”（content index layer），用于一次性扫描所有 posts（通常是 markdown / mdx 文件），构建统一的数据结构，并提供给全局复用。
 
 ### 目标
 	1.	避免多个组件重复扫描文件系统
@@ -72,15 +72,11 @@
 	4.	不引入 Python 或其他语言，完全基于 TypeScript / Node.js 实现
 	5.	兼容 React Server Components（RSC）
 
-
 ### 目录结构要求
 
-实现以下文件：
-	    - lib/posts/getPosts.ts（核心逻辑）
-	    - 可选：scripts/dump-post-index.ts（如果你选择 build 阶段 dump）
+实现文件lib/posts/getposts.ts
 
-
-### 数据结构定义（必须严格遵守）
+### 数据结构定义
 ```ts
 type PostMeta = {
   post_id: number
@@ -89,7 +85,7 @@ type PostMeta = {
   post_category: string
   post_tag: string[]
   post_datetime: string   // 原始字符串，不做补全
-  post_timestamp: number  // 用于排序（毫秒时间戳）
+  post_timestamp: number  // 用于排序，根据原始字符串转换得到毫秒时间戳
 }
 
 type PostIndex = {
@@ -112,8 +108,7 @@ export const getAllPosts: () => PostIndex
 ```
 要求：
 
-#### 1）分层实现（必须）
-
+#### 1）分层实现
 拆分为三个内部函数：
 ```ts
 function scanPosts(): RawPost[]
@@ -171,12 +166,12 @@ export const getAllPosts = cache(() => {
 在 getAllPosts 内：
 ```ts
 if (process.env.NODE_ENV === 'development') {
-  // 写入 .generated/post-index.json
+  // 写入
 }
 ```
 要求：
 - 使用 fs.writeFileSync
-- 输出路径为 .generated/post-index.json
+- 输出格式示例 .logs/postindex_260430_164301.json
 - 确保目录存在
 
 

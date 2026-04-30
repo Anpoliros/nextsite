@@ -1,18 +1,13 @@
 import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
-import { getAllPosts } from "@/lib/markdown";
-import { mdConfig } from "@/md.config";
+import { getAllPosts } from "@/lib/posts/getposts";
 import Image from "next/image";
 import { siteConfig } from '@/site.config';
 
-// 1. 获取所有的 Category，生成静态页面
 export async function generateStaticParams() {
-  const posts = getAllPosts();
-  const categories = Array.from(new Set(posts.map((post) => post.category)));
-  return categories.map((category) => ({
-    category,
-  }));
+  const { categories } = getAllPosts();
+  return categories.map(category => ({ category }));
 }
 
 export default async function CategoryPage(props: {
@@ -22,25 +17,22 @@ export default async function CategoryPage(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const category = params.category;
-  
+
   const page = parseInt(searchParams?.page || "1", 10);
-  
-  // 查找对应分类的全部文章，并按时间降序
-  const allPosts = getAllPosts();
-  const categoryPosts = allPosts
-    .filter((post) => post.category === category)
-    .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
+
+  const { posts } = getAllPosts();
+  const categoryPosts = posts
+    .filter(post => post.post_category === category)
+    .sort((a, b) => b.post_timestamp - a.post_timestamp);
 
   if (categoryPosts.length === 0 && (!siteConfig.categories || !(category in siteConfig.categories))) {
     notFound();
   }
 
-  // 获取分类信息（如果在配置中存在）
   const info = siteConfig.categories && category in siteConfig.categories
     ? siteConfig.categories[category as keyof typeof siteConfig.categories]
     : null;
 
-  // 获取配置中的信息（无配置兜底为默认显示）
   const fallbackInfo = {
     name: category.toUpperCase(),
     description: `分类 ${category} 下的所有文章`,
@@ -49,14 +41,13 @@ export default async function CategoryPage(props: {
   };
   const displayInfo = info || fallbackInfo;
 
-  // 映射为 ArticleList 入参类型
-  const allArticles: Article[] = categoryPosts.map((post) => ({
-    id: `${post.category}/${post.slug}`,
-    title: post.meta.title || post.slug,
-    excerpt: post.excerpt || "暂无简介",
-    date: post.meta.date ? new Date(post.meta.date).toLocaleDateString() : "",
-    category: post.category,
-    tags: post.meta.tags,
+  const allArticles: Article[] = categoryPosts.map(post => ({
+    id: post.post_path.slice(1),
+    title: post.post_title,
+    excerpt: "暂无简介",
+    date: post.post_datetime,
+    category: post.post_category,
+    tags: post.post_tag,
   }));
 
   const limit = siteConfig.pagination?.articlesPerPage || 10;
@@ -83,7 +74,7 @@ export default async function CategoryPage(props: {
           </h1>
         </div>
       )}
-      
+
       {/* Category 简介 */}
       <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
         <p>{displayInfo.description}</p>

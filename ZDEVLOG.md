@@ -284,35 +284,3 @@ about的链接由hero中的subtitle给出。
 
 
 
-# Role: 高级前端架构师 & DESIGN.md 维护者
-
-## Objective
-你需要作为一个 Orchestrator，调度多个并发 Sub-agent 和并发 Function (Tools) calls，全面以 READ ONLY 模式区审查当前 codebase 中的前端代码库的结构与样式配置，理解并提炼出全局设计哲学，并输出 DESIGN_SPEC 规范文档。
-
-## Execution Strategy (并发与检索)
-
-1. **并发读取**: 使用并发的函数调用（Concurrent Function Calls）或生成多个 Sub-agent，并行读取和分析代码库。
-2. **目标范围**:
-   - INCLUDE: 根目录下 *.md 文件, 特别是 AGENTS.md / CLAUDE.md / GEMINI.md / DESIGN.md
-   - INCLUDE: `src` 目录下的所有业务线 `tsx/ts` 组件、Layout 布局文件。
-   - INCLUDE: 全局样式配置（如 `tailwind.config.*`、`index.css` 或相关的 Tailwind CSS/CSS Module 配置文件）。
-   - MUST BE: 排除：第三方基础 UI 库的源码（如 `shadcn/ui` ui 组件库）、`node_modules`、任何构建产物。任务执行期间只允许查询和搜索，严禁增加、修改、删除当前的代码库。
-
-## Task 1: 提炼全局设计哲学并生成 `DESIGN.md`
-
-在完成并发分析后，归纳前端 App 的视觉与架构共性，在根目录创建或更新 `DESIGN.md`。该文档必须包含以下维度：
-
-- **视觉层 (Visual Identity)**: 核心色彩系统、排版规范、间距与阴影的工程化实现方式。
-- **布局层 (Layout Strategy)**: 全局容器、响应式断点策略、以及复杂交互/高密度数据 UI 的常见排布范式。
-- **组件范式 (Component Paradigm)**: 业务组件的拆分逻辑、状态下发模式、以及复用标准。
-- **样式实践 (Styling Rules)**: Tailwind CSS 的组合习惯，如何处理动态类名，以及覆盖默认样式的最佳实践。
-
-## Task 2: 更新 `README AGENTS.md` (或类似 Agent 引导文档)
-
-在 `AGENTS.md` (抑或是 CLAUDE.md) 中增加或更新相应的引导章节，使用其文件中的语言，向未来的 AI 编码助手说明：
-- "在执行「前端开发任务 (开发新组件或页面...)」前，MUST 先阅读 `DESIGN.md` 以对齐全局设计哲学与 Tailwind 规范，确保生成的 UI 代码在视觉与交互上与现有工程保持高度一致。"
-
-## Constraints
-- 执行过程中，请保持思考的透明度，报告并发任务的分配与完成情况。
-- 提炼的内容必须基于代码库中 **实际存在** 的代码规律，严禁凭空捏造设计规范。
-- 任务执行时保持 [READ_ONLY_MODE] [EXPLORE_MODE], 只有当用户确认写入 DESIGN.md 后才能写入/覆盖 DESIGN.md。

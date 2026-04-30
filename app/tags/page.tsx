@@ -1,24 +1,21 @@
 import Link from "next/link";
-import { getAllPosts } from "@/lib/markdown";
+import { getAllPosts } from "@/lib/posts/getposts";
 import { siteConfig } from "@/site.config";
 
 export default function TagsPage() {
-  const posts = getAllPosts();
-  
-  // 聚合各个分类下的 tags
+  const { posts } = getAllPosts();
+
   const tagsByCategory: Record<string, Set<string>> = {};
 
-  posts.forEach((post) => {
-    const categoryName = post.category || "未分类";
+  posts.forEach(post => {
+    const categoryName = post.post_category || "未分类";
     if (!tagsByCategory[categoryName]) {
       tagsByCategory[categoryName] = new Set();
     }
-    const postTags = post.meta.tags || [];
-    postTags.forEach(tag => tagsByCategory[categoryName].add(tag));
+    post.post_tag.forEach(tag => tagsByCategory[categoryName].add(tag));
   });
 
-  // 转换为展示需要的结构，按 category 分组
-  const TagGroups = Object.keys(tagsByCategory).map((categoryKey) => {
+  const TagGroups = Object.keys(tagsByCategory).map(categoryKey => {
     const categoryInfo = siteConfig.categories && siteConfig.categories[categoryKey];
     const displayName = categoryInfo ? categoryInfo.name : categoryKey.toUpperCase();
     return {
@@ -43,9 +40,9 @@ export default function TagsPage() {
             </h2>
             <div className="flex flex-wrap gap-3 pl-4">
               {group.tags.map(tag => (
-                <Link 
+                <Link
                   href={`/tags/${encodeURIComponent(tag)}`}
-                  key={tag} 
+                  key={tag}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium cursor-pointer transition-colors"
                 >
                   #{tag}
