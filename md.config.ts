@@ -5,7 +5,7 @@ import path from 'path';
  */
 export const mdConfig = {
   // Markdown 原片存放的绝对路径
-  contentDir: path.join(process.cwd(), 'content'),
+  contentDir: path.join(process.cwd(), 'articles/content'),
   
   // 转换规则设置（通过在此处控制开关和行为）
   features: {

@@ -19,25 +19,20 @@ tags: ["dev", "typescript"]
 .
 ├── app/                       
 │   ├── page.tsx               # homepage
-│   ├── [category]   
+│   ├── [category]
 │   │   └── [slug]             # 文章页面
 │   └── tags
-│       └── [tag]
 ├── components/                # 公共组件
-├── lib/     
+├── lib/
+│   ├── posts/                 # 内容层
 │   └── markdown/              # md渲染器
-│       ├── codeblock.ts
-│       └── index.ts
 ├── scripts/
 │   ├── clean_ds_store.py      
 │   ├── md_pic_remap.py        # md图片引用匹配工具
 │   └── png2jpg.py
 ├── ecosystem.config.js        # pm2配置
 ├── md.config.ts               # md渲染配置
-├── site.config.ts             # 网站配置
-├── package.json
-├── tsconfig.json
-└── ZDEVLOG                    # 提示词日志
+└── site.config.ts             # 网站配置
 ```
 
 页面

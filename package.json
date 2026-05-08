@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "sync-articles": "git -C articles pull && rsync -a --delete articles/images/ public/images/ && python scripts/md_pic_remap.py --image-dir public/images --md-dir articles/content --web",
+    "dev": "npm run sync-articles && next dev",
+    "build": "npm run sync-articles && next build",
+    "start": "npm run sync-articles && next start",
     "deploy": "npm run build && pm2 start ecosystem.config.js",
     "stop": "pm2 stop nextsite",
     "log": "pm2 logs nextsite",

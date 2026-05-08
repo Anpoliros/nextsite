@@ -274,9 +274,14 @@ about的链接由hero中的subtitle给出。
 ---
 
 
+# 0508
 
+我打算将内容用submodule来管理。我已经添加了submodule到/articles，并把content和images复制进去了。我们来完成同步机制。
 
+每次npm构建前都进行拉取尝试。
 
+content：在mdconfig中直接配置到articals/content
+images：复制到public/images，并且
 
 
 
