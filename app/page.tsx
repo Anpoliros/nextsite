@@ -1,4 +1,6 @@
 import Hero from "@/components/home/Hero";
+import PageShell from "@/components/layout/PageShell";
+import Portals from "@/components/portals/Portals";
 import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
 import { getAllPosts } from "@/lib/posts/getposts";
@@ -31,33 +33,42 @@ export default async function Home(props: { searchParams: Promise<{ page?: strin
   const timelineArticles = mappedPosts.slice(startIndex, endIndex);
 
   return (
-    <div className="flex flex-col w-full">
-      <Hero />
+    <PageShell right={<Portals config={siteConfig.portals} variant="desktop" />}>
+      <div className="flex flex-col w-full">
+        <Hero />
 
-      {/* 置顶文章 */}
-      {pinnedArticles.length > 0 && (
+        {/* 窄屏 Portals：Hero 下、Pinned 上，全宽 */}
+        <Portals
+          config={siteConfig.portals}
+          variant="mobile"
+          className="block md:hidden mb-12"
+        />
+
+        {/* 置顶文章 */}
+        {pinnedArticles.length > 0 && (
+          <div className="mb-12 w-full">
+            <h2 className="mb-6 border-b pb-2 text-2xl font-bold text-gray-800 dark:border-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <span className="text-xl">📌</span> Pinned
+            </h2>
+            <div className="w-full">
+              <ArticleList articles={pinnedArticles} />
+            </div>
+          </div>
+        )}
+
+        {/* 所有的文章时间线 */}
         <div className="mb-12 w-full">
           <h2 className="mb-6 border-b pb-2 text-2xl font-bold text-gray-800 dark:border-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <span className="text-xl">📌</span> Pinned
+            <span className="text-xl">📅</span> Timeline
           </h2>
           <div className="w-full">
-            <ArticleList articles={pinnedArticles} />
+            <ArticleList articles={timelineArticles} />
           </div>
-        </div>
-      )}
 
-      {/* 所有的文章时间线 */}
-      <div className="mb-12 w-full">
-        <h2 className="mb-6 border-b pb-2 text-2xl font-bold text-gray-800 dark:border-gray-800 dark:text-gray-100 flex items-center gap-2">
-          <span className="text-xl">📅</span> Timeline
-        </h2>
-        <div className="w-full">
-          <ArticleList articles={timelineArticles} />
+          {/* 翻页按钮 */}
+          <Pagination totalPages={totalPages} currentPage={page} basePath="/" />
         </div>
-
-        {/* 翻页按钮 */}
-        <Pagination totalPages={totalPages} currentPage={page} basePath="/" />
       </div>
-    </div>
+    </PageShell>
   );
 }

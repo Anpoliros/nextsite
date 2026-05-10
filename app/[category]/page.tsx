@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/posts/getposts";
 import Image from "next/image";
 import { siteConfig } from '@/site.config';
+import PageShell from "@/components/layout/PageShell";
 
 export async function generateStaticParams() {
   const { categories } = getAllPosts();
@@ -57,40 +58,42 @@ export default async function CategoryPage(props: {
   const articles = allArticles.slice(startIndex, endIndex);
 
   return (
-    <div className="flex flex-col">
-      {/* 长条形图片 Banner */}
-      {displayInfo.showImage && displayInfo.image ? (
-        <div className="w-full h-48 bg-blue-100 dark:bg-blue-900 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
-          <Image src={displayInfo.image} alt={displayInfo.name} fill className="object-cover" />
-          <div className="absolute inset-0 bg-blue-900/40 dark:bg-blue-950/60 z-10 "></div>
-          <h1 className="text-3xl font-bold text-white z-20 relative">
-            📂 {displayInfo.name}
-          </h1>
-        </div>
-      ) : (
-        <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 z-10 relative">
-            📂 {displayInfo.name}
-          </h1>
-        </div>
-      )}
-
-      {/* Category 简介 */}
-      <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
-        <p>{displayInfo.description}</p>
-      </div>
-
-      {/* 文章列表 */}
-      <div className="pl-6 relative">
-        {allArticles.length > 0 ? (
-          <>
-            <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
-            <Pagination totalPages={totalPages} currentPage={page} basePath={`/${category}`} />
-          </>
+    <PageShell>
+      <div className="flex flex-col">
+        {/* 长条形图片 Banner */}
+        {displayInfo.showImage && displayInfo.image ? (
+          <div className="w-full h-48 bg-blue-100 dark:bg-blue-900 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
+            <Image src={displayInfo.image} alt={displayInfo.name} fill className="object-cover" />
+            <div className="absolute inset-0 bg-blue-900/40 dark:bg-blue-950/60 z-10 "></div>
+            <h1 className="text-3xl font-bold text-white z-20 relative">
+              📂 {displayInfo.name}
+            </h1>
+          </div>
         ) : (
-          <p className="text-gray-500">此分类下暂无内容。</p>
+          <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 z-10 relative">
+              📂 {displayInfo.name}
+            </h1>
+          </div>
         )}
+
+        {/* Category 简介 */}
+        <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
+          <p>{displayInfo.description}</p>
+        </div>
+
+        {/* 文章列表 */}
+        <div className="pl-6 relative">
+          {allArticles.length > 0 ? (
+            <>
+              <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
+              <Pagination totalPages={totalPages} currentPage={page} basePath={`/${category}`} />
+            </>
+          ) : (
+            <p className="text-gray-500">此分类下暂无内容。</p>
+          )}
+        </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

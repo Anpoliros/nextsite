@@ -3,6 +3,7 @@ import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/posts/getposts";
 import { siteConfig } from "@/site.config";
+import PageShell from "@/components/layout/PageShell";
 
 export async function generateStaticParams() {
   const { tags } = getAllPosts();
@@ -44,21 +45,23 @@ export default async function TagPage(props: {
   const articles = allArticles.slice(startIndex, endIndex);
 
   return (
-    <div className="flex flex-col">
-      <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 z-10 relative">
-          🏷️ #{decodedTag}
-        </h1>
-      </div>
+    <PageShell>
+      <div className="flex flex-col">
+        <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-8 relative flex items-center justify-center">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 z-10 relative">
+            🏷️ #{decodedTag}
+          </h1>
+        </div>
 
-      <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
-        <p>包含标签 <strong>{decodedTag}</strong> 的所有文章</p>
-      </div>
+        <div className="mb-12 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800">
+          <p>包含标签 <strong>{decodedTag}</strong> 的所有文章</p>
+        </div>
 
-      <div className="pl-6 relative">
-        <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
-        <Pagination totalPages={totalPages} currentPage={page} basePath={`/tags/${tag}`} />
+        <div className="pl-6 relative">
+          <ArticleList articles={articles} title={`共 ${allArticles.length} 篇文章`} />
+          <Pagination totalPages={totalPages} currentPage={page} basePath={`/tags/${tag}`} />
+        </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getAllPosts } from '@/lib/posts/getposts';
 import { getPostBySlug } from '@/lib/posts/getpost';
 import MarkdownEnhancer from '@/components/shared/MarkdownEnhancer';
+import PageShell from '@/components/layout/PageShell';
 import { Dices, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export async function generateStaticParams() {
@@ -40,7 +41,8 @@ export default async function ContentPage({
   const randomPost = otherPosts.length > 0 ? otherPosts[Math.floor(Math.random() * otherPosts.length)] : null;
 
   return (
-    <article className="flex flex-col">
+    <PageShell>
+      <article className="flex flex-col">
       {/* 顶部位置提示栏（面包屑） */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
         <Link href="/" className="hover:text-blue-500 hover:underline">Home</Link>
@@ -156,6 +158,7 @@ export default async function ContentPage({
           </span>
         )}
       </div>
-    </article>
+      </article>
+    </PageShell>
   );
 }

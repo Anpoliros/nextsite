@@ -1,3 +1,5 @@
+import type { PortalsConfig } from "@/components/portals/portal.types";
+
 export const siteConfig = {
   title: "Anpoliros",
   description: "Hello from Shanghai",
@@ -92,5 +94,41 @@ export const siteConfig = {
   pagination: {
     articlesPerPage: 10,
     prefetch: true // 控制是否在视口中自动预取翻页的数据
-  }
+  },
+
+  // Portals 入口面板配置
+  portals: {
+    ui: {
+      desktop: {
+        aspectRatio: "4 / 5",
+        background: { type: "image", value: "/images/portal-bg-desktop.webp", opacity: 0 },
+      },
+      mobile: {
+        aspectRatio: "5 / 1",
+        background: { type: "image", value: "/images/portal-bg-mobile.webp", opacity: 0 },
+      },
+    },
+    grid: {
+      desktop: { rows: 3, cols: 2 },
+      mobile:  { rows: 1, cols: 5 },
+    },
+    portals: {
+      git:    { href: "https://git.anpoliros.com",   logo: "/logos/gitea.svg",    label: "Git" },
+      vsss:   { href: "https://vsss.anpoliros.com",         logo: "/logos/441.png",   label: "VSSS" },
+      status: { href: "https://status.anpoliros.com",  logo: "/logos/285.png", label: "Status" },
+    },
+    placements: {
+      desktop: [
+        { portal: "git",    row: 2, col: 2 },
+        { portal: "vsss",   row: 3, col: 1 },
+        { portal: "status", row: 3, col: 2 },
+      ],
+      mobile: [
+        { portal: "git",    row: 1, col: 2 },
+        { portal: "vsss",   row: 1, col: 3 },
+        { portal: "status", row: 1, col: 4 },
+      ],
+    },
+    item: { touchScale: 0.8, logoScale: 0.6 },
+  } satisfies PortalsConfig,
 };

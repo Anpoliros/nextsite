@@ -51,21 +51,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className={`${siteConfig.layout.mainContainer} flex-1 flex justify-start`}>
-            {/* 这里放弃 tailwind 默认的 auto grid，而是动态读取 style 设置 */}
-            <div 
-              className="md:grid gap-8 h-full w-full"
-              style={{ gridTemplateColumns: siteConfig.layout.gridTemplateColumns }}
-            >
-              {/* 左侧主要内容 */}
-              <section className="w-full flex-grow">
-                {children}
-              </section>
-              
-              {/* 右侧侧边栏（宽屏显示，窄屏隐藏） */}
-              <aside className="hidden md:block border-l border-gray-100 dark:border-gray-800 pl-8 h-full min-h-[500px]">
-                {/* 右侧暂时不设计，以此占位 */}
-              </aside>
-            </div>
+            {/* 70/30 grid 与右侧 aside 由各 page 自行通过 <PageShell> 决定 */}
+            {children}
           </main>
           <Footer />
         </ThemeProvider>

@@ -16,6 +16,7 @@ content/developer/*
 !.gitignore
 
 /.archive
+/.c
 
 # dev index dumps
 /.logs
