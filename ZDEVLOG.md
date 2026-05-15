@@ -284,6 +284,372 @@ content：在mdconfig中直接配置到articals/content
 images：复制到public/images，并且
 
 
+# 0511
+
+这个项目越来越复杂，我觉得是时候写一套文档了。在此之前，我想讨论一下对于前端项目，文档的最佳实践是什么样子的。
+
+我设想有一个/docs目录，里面按照各个功能模块有若干目录，基本上都对应到文件。内容上主要描述各个组件的接口、数据模型、构建流程和产物。
+
+为了适应agentic coding，同时也是符合旧时代“写文档给下一个人看”的习惯，在比较关键的地方，文档中应该有For User和For Coder两个section，以此区分模块级设计和模块内细节。同时，AGENTS.md中也应该加入文档规范，实现持续文档。
+
+
+## 1
+
+我觉得你的方向是对的，而且“给人看”和“给 agent 看”其实可以统一起来：好的文档应该让读者快速判断三件事：
+
+1. 这个模块解决什么问题
+2. 我改它会影响哪里
+3. 我应该从哪个文件/接口/流程开始下手
+
+对于一个 Next.js 个人网站，我建议文档不要一开始追求“百科全书式完整”，而是做成**可持续维护的工程地图**。
+
+**推荐结构**
+
+可以用 `/docs`，但不要完全按文件一比一复制，否则很容易变成“源码的影子”，维护成本高。更好的方式是按“功能域/系统能力”组织：
+
+```txt
+docs/
+  README.md
+  architecture/
+    overview.md
+    routing.md
+    data-flow.md
+    styling.md
+  modules/
+    markdown/
+      overview.md
+      renderer.md
+      content-model.md
+    blog/
+      overview.md
+      post-model.md
+      build-output.md
+    navigation/
+      overview.md
+  components/
+    conventions.md
+    public-components.md
+  workflows/
+    development.md
+    build-and-deploy.md
+    content-authoring.md
+  decisions/
+    0001-docs-structure.md
+```
+
+我会把文档分成四类：
+
+- `architecture/`：项目级架构，路由、数据流、样式体系、构建方式。
+- `modules/`：业务/功能模块，例如 markdown 渲染、文章系统、导航、主题。
+- `components/`：组件接口、组件设计规范、可复用 UI 的边界。
+- `workflows/`：开发、构建、部署、内容发布、调试流程。
+- `decisions/`：重要技术决策记录，类似轻量 ADR。
+
+**关于 For User / For Coder**
+
+这个想法很好，但我会稍微改名，避免“User”误解成网站最终访客。可以叫：
+
+```md
+## For Maintainers
+
+面向项目维护者、产品视角、未来的自己。说明这个模块为什么存在、提供什么能力、什么时候应该改它。
+
+## For Coders / Agents
+
+面向实现者和 agent。说明入口文件、关键接口、数据结构、修改注意事项、测试/验证方式。
+```
+
+或者如果你喜欢更直接：
+
+```md
+## 模块视角
+
+这个模块做什么、边界是什么、和其他模块如何协作。
+
+## 实现视角
+
+关键文件、接口、数据模型、改动风险、验证方式。
+```
+
+我个人更推荐中文标题，因为这个项目的 `AGENTS.md` 已经是中文规范，风格统一：
+
+```md
+## 模块视角
+
+## 实现视角
+
+## 数据模型
+
+## 关键文件
+
+## 修改指南
+
+## 验证方式
+```
+
+**单篇模块文档模板**
+
+例如 `docs/modules/markdown/renderer.md` 可以长这样：
+
+```md
+# Markdown Renderer
+
+## 模块视角
+
+Markdown Renderer 负责把站点内容中的 Markdown 转换为页面可渲染结构。
+
+它的边界是：
+- 输入：文章源内容、frontmatter、渲染配置
+- 输出：React 可渲染内容或结构化渲染结果
+- 不负责：路由生成、文章列表排序、页面布局
+
+## 实现视角
+
+### 关键文件
+
+- `lib/markdown/...`
+- `components/...`
+
+### 数据模型
+
+说明核心类型、字段含义、可选字段、默认值。
+
+### 渲染流程
+
+1. 读取 Markdown
+2. 解析 frontmatter
+3. 转换 AST
+4. 渲染为组件
+
+### 修改指南
+
+修改语法支持时，优先改解析层。
+修改视觉样式时，优先改组件层。
+不要在页面组件中直接处理 Markdown 细节。
+
+### 验证方式
+
+- 本地运行页面检查文章渲染
+- 检查代码块、标题、链接、图片、frontmatter
+```
+
+**文档粒度建议**
+
+不要每个组件都写一篇文档。建议分三档：
+
+- 普通组件：只需要 JSDoc/TSDoc 或在 `components/conventions.md` 里说明约定。
+- 复用组件：在 `docs/components/public-components.md` 里记录接口和使用场景。
+- 核心模块：单独建文档，写清楚设计、数据流和修改风险。
+
+比如 `Button.tsx` 不值得单独写文档；但 `MarkdownRenderer`、`PostList`、`ThemeProvider`、`ContentPipeline` 这类值得。
+
+**AGENTS.md 里可以加入的规范**
+
+可以加一节“文档维护规范”，大概这样：
+
+```md
+## 文档维护规范
+
+- 项目文档放在 `docs/` 目录。
+- 修改核心模块、公共组件接口、数据模型、构建流程时，必须同步更新相关文档。
+- 新增重要模块时，应新增对应的 `docs/modules/<module>/overview.md`。
+- 文档应优先解释设计意图、模块边界、数据流和修改风险，不重复粘贴源码。
+- 关键文档建议包含：
+  - 模块视角：模块职责、使用场景、外部行为
+  - 实现视角：关键文件、核心接口、数据模型、修改注意事项
+  - 验证方式：本地运行、构建、测试或人工检查路径
+- 面向 agent 的说明应写清入口文件、依赖关系、不要改动的边界和推荐验证命令。
+```
+
+**我建议的最佳实践**
+
+文档要“少而准”。最重要的不是把所有东西写下来，而是把**变化成本最高、最容易误改、最需要上下文**的部分写下来。
+
+对这个项目来说，我会优先写这几篇：
+
+```txt
+docs/README.md
+docs/architecture/overview.md
+docs/architecture/routing.md
+docs/architecture/styling.md
+docs/modules/markdown/overview.md
+docs/modules/content/overview.md
+docs/workflows/development.md
+docs/workflows/build-and-deploy.md
+docs/components/conventions.md
+```
+
+这样先形成骨架。之后每次做功能时，只要遵守“改核心就补文档”的规则，文档会自然长出来，而不是变成一次性大工程。
+
+## 2
+
+
+关于模块和组件这里，如果用modules和components来划分，感觉会和文件中的lib和components混淆。实际上，诸如换页之类的导航看起来确实是一种components，而lib中的每个目录也都是一个模块。所以虽然不应该让文档成为代码的影子，但我觉得一定的映射关系是更方便维护的。
+
+不过当然，说实话文档不是给我看的是给agent看的，我只是希望能方便agent快速进入状态。如果业界实践确实是没有那样的映射关系，我觉得可以加入一个MAP.md指明文档和文件的关系。
+
+另外文档规范可以放在docs/README.md中，可以缩短AGENTS.md的压力。
 
 
 
+我同意你的修正，而且你抓到一个关键点：**如果主要读者是 agent，文档和代码之间就应该有清晰映射**。业界常说“文档不要复刻代码结构”，主要是为了避免文档变成低价值目录树；但对 agentic coding 来说，适度映射反而是优点，因为它能减少检索成本和误判边界。
+
+我会建议采用一种折中结构：**按代码入口映射，按功能语义命名**。
+
+```txt
+docs/
+  README.md
+  MAP.md
+
+  app/
+    overview.md
+    routing.md
+    layout.md
+
+  components/
+    overview.md
+    navigation.md
+    markdown-view.md
+
+  lib/
+    overview.md
+    markdown.md
+    content.md
+
+  workflows/
+    development.md
+    build.md
+    deploy.md
+
+  decisions/
+    0001-docs-structure.md
+```
+
+这样 `docs/app`、`docs/components`、`docs/lib` 和源码目录有直接对应关系，agent 一眼就知道该去哪里找。但每篇文档不是逐文件描述，而是围绕这个目录里的**职责、边界、入口文件、数据流、修改注意事项**来写。
+
+`MAP.md` 很值得加。它可以是 agent 的“索引表”，比如：
+
+```md
+# Documentation Map
+
+| Source Path | Documentation | Notes |
+| --- | --- | --- |
+| `app/` | `docs/app/overview.md` | 页面结构、布局、路由入口 |
+| `app/**/page.tsx` | `docs/app/routing.md` | 页面路由和渲染策略 |
+| `components/navigation/` | `docs/components/navigation.md` | 导航、换页、链接行为 |
+| `lib/markdown/` | `docs/lib/markdown.md` | Markdown 解析、渲染、扩展点 |
+| `lib/content/` | `docs/lib/content.md` | 内容读取、frontmatter、排序 |
+| `package.json` | `docs/workflows/development.md` | 脚本、依赖、开发命令 |
+| `next.config.*` | `docs/workflows/build.md` | Next.js 构建配置 |
+```
+
+这个文件不需要很长，但要保持准确。它的价值是：agent 先读 `AGENTS.md`，然后读 `docs/MAP.md`，再进入相关文档和源码。
+
+我会把职责分成这样：
+
+**AGENTS.md**
+只放强约束：
+
+```md
+## 文档规范
+
+- 涉及核心模块、公共组件接口、数据模型、构建流程的改动，必须同步检查 `docs/`。
+- 开始修改前，优先查看 `docs/MAP.md`，确认相关源码对应的文档。
+- 文档写作规范见 `docs/README.md`。
+```
+
+**docs/README.md**
+放完整规范：
+
+```md
+# Docs Guide
+
+## 目标
+
+本文档系统主要服务于项目维护和 agentic coding，帮助读者快速理解模块边界、入口文件、数据模型、修改风险和验证方式。
+
+## 组织方式
+
+文档目录与主要源码目录保持轻量映射：
+
+- `docs/app/` 对应 `app/`
+- `docs/components/` 对应 `components/`
+- `docs/lib/` 对应 `lib/`
+- `docs/workflows/` 对应开发、构建、部署流程
+- `docs/decisions/` 记录重要技术决策
+
+## 单篇文档建议结构
+
+### 模块视角
+
+说明模块职责、使用场景、对外行为和不负责的边界。
+
+### 实现视角
+
+说明入口文件、关键文件、核心接口、数据模型和依赖关系。
+
+### 修改指南
+
+说明常见改动应该从哪里开始，哪些地方需要同步更新。
+
+### 验证方式
+
+说明修改后应该运行的命令、检查的页面或人工确认点。
+
+## 写作原则
+
+- 优先解释为什么和边界，不重复源码。
+- 记录稳定接口、数据模型、构建产物和跨目录依赖。
+- 不为每个小组件单独建文档，除非它是公共组件或关键交互。
+- 修改核心逻辑时同步更新相关文档和 `docs/MAP.md`。
+```
+
+我觉得这里最好的实践不是“完全不映射”，而是：
+
+> 文档目录映射代码的大边界，文档内容描述系统的设计边界。
+
+这很适合你的项目。既不会让文档变成源码目录树的复读机，又能让 agent 很快进入状态。
+
+
+# 0512
+
+那我们现在先写一下可以复用的部分。在docs中实现
+
+README.md：通用概述，文档目录和文件的组织，集成方式
+MAP：文档和文件的映射，也许不一定用md格式
+SPEC.md：文档规范，文档模板，应该如何更新文档
+
+预计有了这一套后，文档应该可以规范拓展，没有文档的项目也可以通过这一套让coder快速写文档
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+好，那么我们先写一个简单的版本吧，读一下这个项目，把你认为最迫切的文档写一下。就按照我们的讨论来，文档内部按照
+```
+## 模块
+
+## 实现 
+### 接口
+### 模型
+...
+```
+的格式
