@@ -7,14 +7,35 @@ import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeStringify from 'rehype-stringify'
 import { applyHighlight } from './codeblock'
+import { applyNotices } from './notices'
 import { applyTable } from './table'
+import { applyHeadingAnchors } from './toc'
+import type {
+  MarkdownRenderOptions,
+  MarkdownRenderResult,
+  MarkdownTocItem,
+} from './types'
 import { mdConfig } from '@/md.config'
 
-function buildProcessor() {
+export type {
+  MarkdownRenderOptions,
+  MarkdownRenderResult,
+  MarkdownTocItem,
+} from './types'
+
+export { extractMarkdownExcerpt } from './excerpt'
+
+function buildProcessor(toc: MarkdownTocItem[], options: MarkdownRenderOptions = {}) {
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype, { allowDangerousHtml: true })
+
+  if (mdConfig.features.enableHeadingId) {
+    applyHeadingAnchors(processor, toc, { includeToc: options.includeToc })
+  }
+
+  applyNotices(processor)
 
   if (mdConfig.features.enableHighlight) {
     applyHighlight(processor)
@@ -25,9 +46,22 @@ function buildProcessor() {
   return processor.use(rehypeStringify, { allowDangerousHtml: true })
 }
 
+export async function renderMarkdownDocument(
+  content: string,
+  options: MarkdownRenderOptions = {}
+): Promise<MarkdownRenderResult> {
+  const toc: MarkdownTocItem[] = []
+  const file = await buildProcessor(toc, options).process(content)
+
+  return {
+    html: String(file),
+    toc,
+  }
+}
+
 export async function renderMarkdownContent(content: string): Promise<string> {
-  const file = await buildProcessor().process(content)
-  return String(file)
+  const result = await renderMarkdownDocument(content)
+  return result.html
 }
 
 /**
@@ -41,10 +75,11 @@ export async function getSinglePostContent(relativePath: string) {
   }
 
   const { data, content } = matter(fs.readFileSync(targetPath, 'utf-8'))
-  const html = await renderMarkdownContent(content)
+  const { html, toc } = await renderMarkdownDocument(content)
 
   return {
     meta: { title: String(data.title ?? '') },
     content: html,
+    toc,
   }
 }

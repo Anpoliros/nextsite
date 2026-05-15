@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getAllPosts } from '@/lib/posts/getposts';
 import { getPostBySlug } from '@/lib/posts/getpost';
-import MarkdownEnhancer from '@/components/shared/MarkdownEnhancer';
+import { renderMarkdownDocument } from '@/lib/markdown';
+import ArticleBody from '@/components/shared/ArticleBody';
+import ArticleToc from '@/components/shared/ArticleToc';
 import PageShell from '@/components/layout/PageShell';
 import { Dices, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -12,6 +14,16 @@ export async function generateStaticParams() {
     category: post.post_category,
     slug: post.post_path.split('/').at(-1)!,
   }));
+}
+
+function stableIndexFromPath(path: string, length: number): number {
+  let hash = 0;
+
+  for (const char of path) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+
+  return hash % length;
 }
 
 export default async function ContentPage({
@@ -27,7 +39,10 @@ export default async function ContentPage({
     notFound();
   }
 
-  const { meta, content } = postInfo;
+  const { meta, rawContent } = postInfo;
+  const rendered = await renderMarkdownDocument(rawContent, {
+    includeToc: meta.post_show_toc,
+  });
 
   const allPosts = [...getAllPosts().posts].sort((a, b) => b.post_timestamp - a.post_timestamp);
   const currentIndex = allPosts.findIndex(p =>
@@ -38,7 +53,9 @@ export default async function ContentPage({
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 
   const otherPosts = allPosts.filter((_, i) => i !== currentIndex);
-  const randomPost = otherPosts.length > 0 ? otherPosts[Math.floor(Math.random() * otherPosts.length)] : null;
+  const randomPost = otherPosts.length > 0
+    ? otherPosts[stableIndexFromPath(meta.post_path, otherPosts.length)]
+    : null;
 
   return (
     <PageShell>
@@ -73,13 +90,10 @@ export default async function ContentPage({
           {meta.post_datetime && <time>{new Date(meta.post_datetime).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>}
         </div>
 
-        <MarkdownEnhancer />
+        {meta.post_show_toc && <ArticleToc items={rendered.toc} />}
 
         {/* 渲染真实的 Markdown 内容 */}
-        <div
-          className="text-gray-800 dark:text-gray-200 leading-relaxed space-y-4"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <ArticleBody html={rendered.html} />
       </div>
 
       {/* 底部信息区 */}

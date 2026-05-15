@@ -45,7 +45,7 @@ export default async function CategoryPage(props: {
   const allArticles: Article[] = categoryPosts.map(post => ({
     id: post.post_path.slice(1),
     title: post.post_title,
-    excerpt: "暂无简介",
+    excerpt: post.post_excerpt || "暂无简介",
     date: post.post_datetime,
     category: post.post_category,
     tags: post.post_tag,

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getSinglePostContent } from '@/lib/markdown';
-import MarkdownEnhancer from '@/components/shared/MarkdownEnhancer';
+import ArticleBody from '@/components/shared/ArticleBody';
 import PageShell from '@/components/layout/PageShell';
 
 export default async function AboutPage() {
@@ -21,13 +21,8 @@ export default async function AboutPage() {
             {meta.title || 'About'}
           </h1>
 
-          <MarkdownEnhancer />
-
           {/* 渲染真实的 Markdown 内容 */}
-          <div
-            className="text-gray-800 dark:text-gray-200 leading-relaxed space-y-4"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          <ArticleBody html={content} />
         </div>
       </article>
     </PageShell>

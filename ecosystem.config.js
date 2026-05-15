@@ -12,6 +12,17 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'nextsite-articles-hook',
+      script: 'scripts/articles_webhook.mjs',
+      cwd: '/home/anpoliros/nextsite',
+      instances: 1,
+      autorestart: true, // Webhook daemon 崩溃后自动恢复
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };

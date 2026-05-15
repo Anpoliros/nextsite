@@ -1,0 +1,148 @@
+我更赞同你现在这个方向：**`lib/posts` 做内容收集器，`lib/markdown` 做内容解释器，页面/服务端组件做编排者。** 这比我前面说的“让 `getposts` 调 `extractMarkdownExcerpt`”更干净。
+
+有一个小校正：现有代码里 `lib/posts/getpost.ts` 其实是文章详情页用的，about.md 现在走的是 `lib/markdown/index.ts` 里的 `getSinglePostContent()`。但这不影响我们讨论目标架构：`getposts` 可以逐步变成“结构化收集所有文章原始数据”，Markdown 渲染则交给页面侧调用。
+
+我建议的数据流是这样：
+
+```txt
+getAllPosts()
+  -> PostSource[]  // frontmatter + raw markdown + path 信息，缓存
+
+页面 Server Component
+  -> 根据场景调用 lib/markdown
+     列表页：extractMarkdownExcerpt(raw)
+     详情页：renderMarkdownDocument(raw, { toc: meta.post_show_toc })
+
+组件
+  -> ArticleList / ArticleBody / ArticleToc 只消费结构化结果
+```
+
+对应类型可以这样设计：
+
+```ts
+export type PostSource = {
+  post_id: number
+  post_title: string
+  post_path: string
+  post_filepath: string
+  post_category: string
+  post_tag: string[]
+  post_datetime: string
+  post_timestamp: number
+  post_show_toc: boolean
+  raw_content: string
+}
+
+export type MarkdownTocItem = {
+  id: string
+  text: string
+  depth: number
+}
+
+export type MarkdownRenderResult = {
+  html: string
+  excerpt: string
+  hasMore: boolean
+  toc: MarkdownTocItem[]
+}
+```
+
+详情页调用：
+
+```ts
+const rendered = await renderMarkdownDocument(post.raw_content, {
+  includeToc: post.post_show_toc,
+})
+```
+
+列表页调用：
+
+```ts
+const excerpt = extractMarkdownExcerpt(post.raw_content).text
+```
+
+这样 `toc` 要不要生成由 `post_show_toc` 决定。更细一点：即使 `includeToc: false`，heading id 仍然可以生成，因为文章内锚点是正文渲染能力；但 TOC 数组不用收集。这个成本最低，也符合语义。
+
+关于速度：这个结构下不会“所有文章都完整渲染一遍 TOC”。`getAllPosts()` 只是读文件进缓存和结构化 frontmatter；列表页只跑轻量 excerpt；详情页才跑完整 Markdown render。构建时所有详情页当然最终都会渲染正文，但 TOC 是在那次渲染里顺手收集，不需要二次 parse。
+
+notice 的 CSS 你说得也对：继续往 `global.css` 塞会让 Markdown 模块的样式所有权越来越模糊。我建议新增一个服务端组件：
+
+```txt
+components/shared/ArticleBody.tsx
+components/shared/ArticleBody.module.css
+```
+
+`ArticleBody` 负责：
+
+```tsx
+<MarkdownEnhancer />
+<div className={styles.body} dangerouslySetInnerHTML={{ __html: html }} />
+```
+
+notice、代码块、表格这些由 Markdown 生成的 HTML，其样式都收敛到 `ArticleBody.module.css`，用 `:global(.markdown-notice)`、`:global(.code-block-figure)` 这类选择器挂在 `.body` 下。这样不是全局污染，但仍能样式化 `dangerouslySetInnerHTML` 里的节点。
+
+`MarkdownEnhancer` 不应该 mock 掉整个组件，因为现在代码块复制、表格复制、折行还依赖它。但 notice 当前没有交互，所以不需要让 enhancer 处理 notice。更准确地说：
+
+```txt
+lib/markdown/notices.ts
+  生成静态 notice HTML
+
+ArticleBody.module.css
+  管 notice 样式
+
+MarkdownEnhancer.tsx
+  只管确实需要浏览器能力的增强：复制、折行、未来可折叠 notice 等
+```
+
+我会把最终边界定成：
+
+```txt
+lib/posts
+  只读文件、解析 frontmatter、缓存 PostSource[]
+
+lib/markdown
+  renderMarkdownDocument()
+  extractMarkdownExcerpt()
+  heading id / toc / notice / math 都在这里
+
+app 页面
+  决定调用哪种 markdown 处理能力
+
+components/shared
+  ArticleBody: HTML 容器 + MarkdownEnhancer + scoped CSS
+  ArticleToc: 目录展示
+  ArticleList: 列表展示
+```
+
+这个架构最重要的好处是：`lib/posts` 不知道 Markdown 语义，`lib/markdown` 不知道文章路由，组件不碰 AST。每层都比较单纯，后面加 math、notice、TOC、摘要规则都不会互相牵连。
+
+
+好的，我会把范围收紧到两件事：静态 notice 指令、文章详情页 TOC。先补读文档规则和现有样式/页面调用点，然后直接改代码与文档。
+
+
+已探索 4 个文件
+我已经确认 docs/MAP.md 指向 docs/lib/markdown.md 和 docs/lib/posts.md。实现上会顺手把 Markdown 生成的 HTML 样式从 globals.css 收拢到新的正文容器组件里，notice 也放那里。
+
+
+已探索 7 个文件,3 次搜索,1 个列表
+我会把 renderMarkdownContent 做成兼容层，新增更明确的 renderMarkdownDocument() 返回 { html, toc }；这样老调用不突然炸，新文章页则走新结构。接下来开始改 lib/markdown、lib/posts 和共享组件。
+
+
+已创建 3 个文件,已编辑 1 个文件,已探索 4 个文件,已批准 1 项请求
+Markdown 层的基础能力已经落下来了：新增了 heading id/TOC 收集，以及 HTML 注释指令转 notice 的 rehype 阶段插件。现在把文章收集层改成缓存原始正文和 showToc 元数据，不在这里渲染 Markdown。
+
+
+已创建 4 个文件,已编辑 2 个文件,正在编辑 1 个文件,已探索 1 个文件,已批准 6 项请求,已运行 1 条命令
+已创建 4 个文件,已编辑 2 个文件,正在编辑 1 个文件,已探索 1 个文件,已批准 6 项请求,已运行 1 条命令
+正文容器和 TOC 组件已经加好，Markdown 相关样式也从 globals.css 迁到 ArticleBody.module.css。现在接入文章详情页和 about 页面。
+
+
+已编辑 2 个文件,已批准 2 项请求
+功能接入完成了第一遍。我现在跑 lint，看 TypeScript、CSS Modules 和新的 markdown pipeline 有没有不合拍的地方。
+
+已运行 npm run lint
+lint 抓到一个现有但在文章页里的问题：Math.random() 不能直接在 Server Component render 阶段调用。我会顺手把“随机一篇”改成基于当前文章路径的稳定选择，这样构建和 hydration 都更可预测。
+
+
+已编辑 2 个文件,已探索 1 个文件,已批准 2 项请求,已运行 1 条命令
+lint 已经过了。接下来我更新文档，把新的数据流、frontmatter、notice 指令和 scoped Markdown 样式归属写清楚。

@@ -17,16 +17,19 @@
 `package.json` 中的 `sync-articles` 当前执行：
 
 ```sh
-git -C articles pull
+git -C articles fetch --prune
+git -C articles reset --hard @{u}
+git -C articles clean -fd
 rsync -a --delete articles/images/ public/images/
 python scripts/md_pic_remap.py --image-dir public/images --md-dir articles/content --web
 ```
 
 流程含义：
 
-1. 更新 `articles` 子模块。
-2. 将 `articles/images/` 镜像同步到 `public/images/`。
-3. 扫描 `public/images/`，把 Markdown 中的本地图片引用改写成 `/images/...`。
+1. 拉取 `articles` 子模块远端引用。
+2. 将子模块强制重置到当前分支的 upstream，并清理未跟踪文件。
+3. 将 `articles/images/` 镜像同步到 `public/images/`。
+4. 扫描 `public/images/`，把 Markdown 中的本地图片引用改写成 `/images/...`。
 
 ## 脚本行为
 
@@ -46,6 +49,7 @@ Web 模式下，输出路径基于图片目录名生成。例如 `--image-dir pu
 - 修改图片目录时，同时更新 `package.json`、`docs/content/articles.md` 和 `docs/MAP.md`。
 - 修改路径匹配策略时，优先用 `--dry-run` 在真实内容上验证。
 - 修改输出路径模式时，确认 Next.js `public/` 路径仍能被浏览器访问。
+- `sync-articles` 会丢弃 `articles/` 内的本地临时改动；需要保留的文章改动应先提交到内容仓库。
 - 如果不希望开发命令修改内容文件，需要重新设计 `sync-articles` 的触发时机。
 
 ## 验证方式
@@ -67,4 +71,3 @@ npm run sync-articles
 - `public/images/` 是否与 `articles/images/` 一致。
 - Markdown 图片引用是否输出为 `/images/...`。
 - 文章详情页图片是否能正常加载。
-

@@ -169,7 +169,7 @@ export function applyHighlight(processor: unknown) {
 
       const properties = node.properties as Record<string, unknown>;
 
-      // 给外层 figure 添加基础的样式（保持整体一块），这部分类名定义已移动到 globals.css 的 .code-block-figure 中
+      // 给外层 figure 添加基础样式钩子，具体样式由 globals.css 接管。
       properties.className = [
         ...(Array.isArray(properties.className) ? properties.className : []),
         'code-block-figure', 'group'

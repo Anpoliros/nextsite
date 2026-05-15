@@ -621,27 +621,7 @@ SPEC.md：文档规范，文档模板，应该如何更新文档
 
 预计有了这一套后，文档应该可以规范拓展，没有文档的项目也可以通过这一套让coder快速写文档
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---
 
 好，那么我们先写一个简单的版本吧，读一下这个项目，把你认为最迫切的文档写一下。就按照我们的讨论来，文档内部按照
 ```
@@ -653,3 +633,108 @@ SPEC.md：文档规范，文档模板，应该如何更新文档
 ...
 ```
 的格式
+
+
+# 0515
+
+我们来为lib/markdown增加些功能。在实际开发前，先讨论一下
+
+1. 数学公式支持
+
+2. 自定义组件支持
+现在文章中存在的自定义组件只有<!--more-->，它的意义是，在截取摘要时不截取后面的内容。但是现在的摘要功能并没有利用到这个组件。
+我还想加入<!--copyright-notice><!--spoiler-alert-->这样的自定义组件，将渲染成一个notice的样式，像wikipedia里那样
+
+3. 目录
+不知道这个是不是应该由lib/markdown来实现。我的设想是读取文章元数据的ShowToc=true，然后在文章头部渲染一个可以展开折叠的目录。
+
+-> 回到顶部按钮
+
+---
+
+1. 如果让所有文章都生成一遍toc会不会影响速度？
+
+2. 摘要为什么由lib/posts生成？我觉得这个交给lib/markdown更好
+
+我说的不一定对，我们讨论一下，并且设计一下具体的组件间数据结构
+
+---
+
+
+lib/posts是负责在构建时将所有文章“加入内存”的，即构建时总是调用getposts.ts将所有文章结构化，放入缓存中供之后的组件消费。而getpost.ts是负责单独处理about.md之类的特殊页面的（lib/markdown中有个遗留函数，也许以后可以去掉）。所以我的问题是为什么还要让getposts来调用extractMarkdownExcerpt？getpost只是个收集器，markdown不应该又它调用，而是应该由页面组件调用。页面组件调用markdown后，得到markdown、excerpt、toc等等，其中toc要不要根据post_show_toc来决定
+
+关于notice，我也觉得不应该污染global.css。在lib/markdown渲染时，应该把notice的静态内容渲染好，再交给MarkdownEnhancer来做需要交互的功能（例如按钮）增加。由于我们现在不打算加，所以MarkdownEnhancer应该直接mock掉。css应该在二者中的某一个处注入，而非global.css。
+
+我的理解不一定对，现有pipeline也不一定最优，你需要根据文档、代码和最佳实践判断。
+
+---
+
+这次pipeline看起来没什么问题了。我们来实现吧，在这轮实现中只需要完成静态notice和toc。别忘了更新文档
+
+---
+
+notices、toc实现的很好。
+
+1. codeblock的css有些小问题，现在代码内容（<span>）到code-block-pre之间的距离变大了。你可以通过查看上一个提交中的相关文件的方式debug一下，我希望能够恢复之前的样式
+
+2. 摘要功能
+现在所有文章还是显示暂无简介。我明确一下需求：
+摘要就是元数据到<!--more-->之间的内容。在大多数情况下，它是文章的#一级标题。在摘要中不应该显示markdown标记。举例：
+```md
+---
+xxx
+---
+
+# 123
+
+<!--more-->
+
+xxx
+```
+这时，摘要是123
+
+---
+
+摘要实现了。但是codeblock问题变大了，现在样式似乎直接消失了。依旧查看旧代码，研究下问题所在。如果module.css的方式实在解决不了，那就将代码块回退到旧的glocal.css实现
+
+---
+
+终于ok了。还有些小问题
+
+
+---
+
+看起来并不复杂，问题是我的服务器没有公网ip，nextsite是暴露到cloudflared tunnel的，域名anpoliros.com。现在有两个路线
+
+1. 实际上目前gitea服务和nextsite在同一个内网（甚至，同一台机器），所以让daemon运行在内网，hook设置成内网ip:port
+
+2. 将daemon映射到anpoliros.com/hooks，daemon也集成在nextsite项目中。这是可行的吗？
+
+说说哪个好一些
+
+---
+
+行，那我们就暂时不考虑用路径了。先实现上两个脚本吧，监听端口在头部配置方便我修改。不过我应该用什么管理daemon的生命周期呢？也许集成进npm run？
+
+---
+
+1. 在两个脚本中加一些注释
+
+2. ip port secret都别用环境变量了，感觉太不方便，直接写在webhook头部
+
+3. deploy.sh感觉和npm run deploy不等价啊，pull和python mdpic呢
+
+---
+
+在gitea测试钩子报错
+Delivery: Post "http://10.177.87.87:12122/hooks/articles": dial tcp 10.177.87.87:12122: webhook can only call allowed HTTP servers (check your webhook.ALLOWED_HOST_LIST setting), deny '10.177.87.87(10.177.87.87:12122)'
+
+响应头为空。同时本地curl http://localhost:12122/hooks/articles是connection refused。但是lsof -i :12122正常，pm2 list正常。尝试pm2 stop再start了没用。
+
+我的监听地址配置的是10.177.87.87，这就是本机在局域网内的地址，也是gitea在局域网内的地址。我觉得应该没问题啊
+
+---
+
+我在gitea上测试成功了，返回{"ok":true,"skipped":"ignored ref: refs/heads/main"}。但是我试着本地push并没有导致网站发生更新。看看怎么回事，以及告诉我怎么看gitea和pm2的事件历史
+
+另外，我想在本地没有任何更改的时候push也能触发自动构建，这能实现吗

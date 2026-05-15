@@ -15,7 +15,7 @@
 | `/tags` | `app/tags/page.tsx` | `getAllPosts()` | 按分类聚合标签 |
 | `/tags/[tag]` | `app/tags/[tag]/page.tsx` | `getAllPosts()` | 标签文章列表，tag 需要 `decodeURIComponent` |
 | `/[category]` | `app/[category]/page.tsx` | `getAllPosts()`、`siteConfig.categories` | 分类文章列表 |
-| `/[category]/[slug]` | `app/[category]/[slug]/page.tsx` | `getPostBySlug()` | 文章详情页 |
+| `/[category]/[slug]` | `app/[category]/[slug]/page.tsx` | `getPostBySlug()`、`renderMarkdownDocument()` | 文章详情页，可按 `showToc` 展示目录 |
 
 ## 静态参数
 
@@ -38,6 +38,8 @@ articles/content/<category>/<slug>.md
 
 分类来自内容目录的第一层目录名，slug 来自 Markdown 文件名。放在 `articles/content` 根目录下的 Markdown 不进入文章索引，适合 `about.md` 这类单页内容。
 
+文章详情页从 `getPostBySlug()` 取得原始 Markdown，再在页面层调用 `renderMarkdownDocument()` 得到 HTML 和 TOC。是否展示目录由 `PostMeta.post_show_toc` 决定。
+
 ## 修改指南
 
 - 修改 URL 结构时，优先从 `PostMeta.post_path` 入手，并同步更新所有使用 `article.id` 或 `post_path` 的组件。
@@ -50,4 +52,3 @@ articles/content/<category>/<slug>.md
 - `npm run build`
 - 检查分类页不存在时是否进入 `notFound()`。
 - 检查中文或特殊字符标签能从 `/tags` 正确跳转到 `/tags/[tag]`。
-

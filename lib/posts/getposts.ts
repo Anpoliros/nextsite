@@ -3,15 +3,19 @@ import path from 'path'
 import { cache } from 'react'
 import matter from 'gray-matter'
 import { mdConfig } from '@/md.config'
+import { extractMarkdownExcerpt } from '@/lib/markdown'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type RawPost = {
   filePath: string
+  content: string
   frontmatter: {
     title?: unknown
     date?: Date | string | unknown
     tags?: unknown
+    showToc?: unknown
+    ShowToc?: unknown
     [key: string]: unknown
   }
 }
@@ -25,6 +29,9 @@ export type PostMeta = {
   post_tag: string[]
   post_datetime: string   // raw string, no normalization
   post_timestamp: number  // ms since epoch for sorting; 0 if unparseable
+  post_show_toc: boolean
+  post_excerpt: string
+  post_content: string
 }
 
 export type PostIndex = {
@@ -63,6 +70,14 @@ function dateToTimestamp(date: unknown): number {
   return 0
 }
 
+function booleanFromFrontmatter(value: unknown): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    return ['true', '1', 'yes', 'y'].includes(value.trim().toLowerCase())
+  }
+  return false
+}
+
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
 function scanPosts(): RawPost[] {
@@ -75,14 +90,14 @@ function scanPosts(): RawPost[] {
     })
     .sort()  // stable alphabetical order → stable post_id across builds
     .map((filePath) => {
-      const { data } = matter(fs.readFileSync(filePath, 'utf-8'))
-      return { filePath, frontmatter: data }
+      const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'))
+      return { filePath, content, frontmatter: data }
     })
 }
 
 function normalizePosts(raw: RawPost[]): PostMeta[] {
   const contentDir = mdConfig.contentDir
-  return raw.map(({ filePath, frontmatter }, index) => {
+  return raw.map(({ filePath, content, frontmatter }, index) => {
     const rel = path.relative(contentDir, filePath)
     const category = rel.split(path.sep)[0]
     const slug = path.basename(filePath, path.extname(filePath))
@@ -99,8 +114,22 @@ function normalizePosts(raw: RawPost[]): PostMeta[] {
       post_tag: tags,
       post_datetime: dateToString(frontmatter.date),
       post_timestamp: dateToTimestamp(frontmatter.date),
+      post_show_toc: booleanFromFrontmatter(frontmatter.showToc ?? frontmatter.ShowToc),
+      post_excerpt: extractMarkdownExcerpt(content),
+      post_content: content,
     }
   })
+}
+
+function buildLogSnapshot(index: PostIndex): PostIndex {
+  return {
+    ...index,
+    posts: index.posts.map((post) => ({
+      ...post,
+      // 正文已缓存在内存里；日志快照只保留索引信息，避免生成超大的调试文件。
+      post_content: `[markdown content: ${post.post_content.length} chars]`,
+    })),
+  }
 }
 
 function buildIndex(posts: PostMeta[]): PostIndex {
@@ -135,7 +164,7 @@ export const getAllPosts = cache((): PostIndex => {
     ].join('')
     fs.writeFileSync(
       path.join(logsDir, `postindex_${stamp}.json`),
-      JSON.stringify(index, null, 2)
+      JSON.stringify(buildLogSnapshot(index), null, 2)
     )
   }
 

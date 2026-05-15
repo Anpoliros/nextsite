@@ -25,7 +25,9 @@ Next.js 相关实现需要以 `node_modules/next/dist/docs/` 中的本地文档�
 | `npm run build` | 同步文章和图片后执行生产构建 |
 | `npm run start` | 同步文章和图片后启动生产服务 |
 | `npm run lint` | 运行 ESLint |
-| `npm run sync-articles` | 拉取 articles 子模块、同步图片、重写 Markdown 图片路径 |
+| `npm run sync-articles` | 强制对齐 articles 子模块 upstream、同步图片、重写 Markdown 图片路径 |
+| `npm run hook:articles` | 前台启动 articles webhook daemon，用于本地调试自动部署触发 |
+| `npm run hook:deploy-articles` | 手动执行 articles 自动部署脚本 |
 | `npm run deploy` | 构建后通过 PM2 启动 |
 | `npm run stop` | 停止 PM2 进程 |
 | `npm run log` | 查看 PM2 日志 |
@@ -33,7 +35,7 @@ Next.js 相关实现需要以 `node_modules/next/dist/docs/` 中的本地文档�
 ## 开发前检查
 
 - 修改 Next.js 路由、页面参数、Server/Client Component 边界前，先读相关 Next 本地文档。
-- 修改文章或图片流程前，先确认 `articles/` 子模块状态。
+- 修改文章或图片流程前，先确认 `articles/` 子模块状态；`sync-articles` 会丢弃子模块内的本地临时改动。
 - 修改 Markdown 渲染前，先准备包含代码块和表格的文章用于人工检查。
 - 修改公共组件接口时，同步检查引用页面和 `docs/MAP.md`。
 
@@ -62,4 +64,3 @@ npm run sync-articles
 - `npm run dev`、`build`、`start` 都会先运行 `sync-articles`，可能修改 `articles/content` 中的图片引用。
 - `getAllPosts()` 会写 `.logs/postindex_*.json`，这是索引排查产物。
 - 页面路由参数使用 Next.js 16 的 Promise 写法，修改时不要回退到旧式同步参数。
-

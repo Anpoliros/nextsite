@@ -6,7 +6,7 @@
 
 本模块负责页面级编排：读取 `lib/posts` 提供的文章索引，把数据映射为组件需要的展示模型，并通过 `PageShell` 接入全局布局。
 
-它不负责 Markdown 解析、文章文件扫描、内容同步和 Portal 配置模型。这些能力分别由 `lib/markdown/`、`lib/posts/`、`scripts/` 和 `site.config.ts` 提供。
+它不负责 Markdown AST 细节、文章文件扫描、内容同步和 Portal 配置模型。这些能力分别由 `lib/markdown/`、`lib/posts/`、`scripts/` 和 `site.config.ts` 提供。文章详情页负责调用 `renderMarkdownDocument()`，并把结果交给正文和目录组件展示。
 
 ## 实现视角
 
@@ -30,10 +30,10 @@ articles/content/
   -> components/shared/ArticleList.tsx
 
 articles/content/<category>/<slug>.md
-  -> lib/posts/getpost.ts
-  -> lib/markdown/index.ts
+  -> lib/posts/getposts.ts / getpost.ts
   -> app/[category]/[slug]/page.tsx
-  -> components/shared/MarkdownEnhancer.tsx
+  -> lib/markdown/index.ts（renderMarkdownDocument）
+  -> components/shared/ArticleBody.tsx、ArticleToc.tsx
 ```
 
 首页、分类页和标签页都会把 `PostMeta` 映射为 `Article`。如果修改文章列表字段，应同步检查 `components/shared/ArticleList.tsx` 和 `docs/lib/posts.md`。
@@ -57,4 +57,3 @@ articles/content/<category>/<slug>.md
 - `docs/components/layout.md`
 - `docs/lib/posts.md`
 - `docs/lib/markdown.md`
-
