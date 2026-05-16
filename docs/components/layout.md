@@ -25,7 +25,8 @@
 - `layout.headerContainer`：顶部栏容器宽度和内边距。
 - `layout.mainContainer`：主内容容器宽度和页面内边距。
 - `ui.themeColors`：根布局注入的浅色/深色模式 CSS 变量。
-- `ui.fontSizes`：Header、Hero、Footer 等文字尺寸。
+- `ui.fontSizes`：Header、Footer 等全局布局文字尺寸。
+- `hero`：首页 Hero 的背景图、标题、副标题、对齐、颜色和字号。
 - `navLinks`：顶部导航链接。
 
 ## Server/Client 边界
@@ -46,4 +47,3 @@
 - 检查桌面端首页右侧 Portal 是否仍位于 aside。
 - 检查移动端导航是否换行到第二行并可横向滚动。
 - 切换 system、dark、light 主题，确认没有 hydration 警告或图标错位。
-

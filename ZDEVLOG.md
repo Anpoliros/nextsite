@@ -738,3 +738,51 @@ Delivery: Post "http://10.177.87.87:12122/hooks/articles": dial tcp 10.177.87.87
 我在gitea上测试成功了，返回{"ok":true,"skipped":"ignored ref: refs/heads/main"}。但是我试着本地push并没有导致网站发生更新。看看怎么回事，以及告诉我怎么看gitea和pm2的事件历史
 
 另外，我想在本地没有任何更改的时候push也能触发自动构建，这能实现吗
+
+# 0516
+
+我们现在写个python脚本articles/tablefmt.py，它将把md文件中的表格格式化为“最右侧对齐”的状态，增加可读性。例如
+将
+```md
+| 140 | 128+SIGUSR2(12)，x86/ARM 常见 |
+| 123123123 | 128+SIGPIPE(13) |
+```
+转换成
+```md
+| 140       | 128+SIGUSR2(12)，x86/ARM 常见 |
+| 123123123 | 128+SIGPIPE(13)              |
+```
+其实就是增加空格。
+
+实现细节：
+1. 也许要先识别最长行，再补齐空格。各个列之间也要实现对齐。
+2. 需要多线程
+3. 需要保证不损坏文件
+
+用法
+python tablefmt.py <file>
+python tablefmt.py -d/--dir <dir>这将递归转换目录下所有md中的表格
+python tablefmt.py -d/--dir <dir> --flat只转换目录下的，不递归
+--dry-run
+
+这是一个临时任务，不需要动文档
+
+---
+
+我们来改一下hero组件的行为。
+
+1. 在config中，将其单独列出来
+```json
+"hero":{
+  bg
+  title
+  subtitle
+  ...
+}
+```
+
+2. hero title下面的"About"也加入可配置项，作为subtitle。分为description和link两个字段，link允许为空。其行为需要与现在保持一致。
+
+3. 可以配置hero title向左还是向右对齐，而且随主题变化。例如，浅色模式保持现在的布局，深色模式下title和subtitle向右对齐。
+
+4. title和subtitle的内容也可以在不同主题下分别定义

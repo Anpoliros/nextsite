@@ -50,19 +50,7 @@ export const siteConfig = {
   },
   
   ui: {
-    // 锁定纵横比
-    heroAspectRatio: "aspect-[4/3] md:aspect-[21/9]", // 增加了移动端比例
     categoryBannerAspectRatio: "aspect-[4/1]",
-    // 深浅模式Hero图片
-    heroImages: {
-      light: "/bg-light.jpg", // 可换成你真实的图片链接或本地路径
-      dark: "/bg-dark.jpg",
-    },
-    // Hero 文本颜色控制
-    heroColors: {
-      title: "text-lime-300 dark:text-white",
-      subtitle: "text-gray-500 dark:text-gray-300",
-    },
     // 网站主题基础颜色：在这里直接定义 Hex / RGB 颜色值
     themeColors: {
       light: {
@@ -79,10 +67,51 @@ export const siteConfig = {
       headerLogo: "text-2xl",
       headerNav: "text-base",
       headerActions: "text-base",
-      heroTitle: "text-xl md:text-2xl",
-      heroSubtitle: "text-base md:text-base",
       footer: "text-sm",
     }
+  },
+
+  // 首页 Hero 配置：文案、背景与主题差异集中维护
+  hero: {
+    aspectRatio: "aspect-[4/3] md:aspect-[21/9]",
+    bg: {
+      light: "/bg-alice.jpeg",
+      dark: "/bg-shizuko.jpeg",
+    },
+    align: {
+      light: "left",
+      dark: "right",
+    },
+    title: {
+      light: "Hello from Shanghai",
+      dark: "Hello from Shanghai",
+    },
+    subtitle: {
+      light: {
+        description: "About",
+        link: "/about",
+      },
+      dark: {
+        description: "About",
+        link: "/about",
+      },
+    },
+    colors: {
+      title: "text-white dark:text-white",
+      subtitle: "text-gray-500 dark:text-gray-300",
+    },
+    fontSizes: {
+      title: "text-xl md:text-2xl",
+      subtitle: "text-base md:text-base",
+    },
+  } satisfies {
+    aspectRatio: string;
+    bg: Record<"light" | "dark", string>;
+    align: Record<"light" | "dark", "left" | "right">;
+    title: Record<"light" | "dark", string>;
+    subtitle: Record<"light" | "dark", { description: string; link: string }>;
+    colors: { title: string; subtitle: string };
+    fontSizes: { title: string; subtitle: string };
   },
   
   // 置顶文章
