@@ -15,6 +15,7 @@
 | ------------------------- | ------------------------------------------------ | ---------------------------------------------------- |
 | `AGENTS.md`               | `docs/README.md`, `docs/SPEC.md`, `docs/init.md` | 修改 coding agent 工作规则、文档接入方式或项目约束时 |
 | `README.md`               | `docs/README.md`                                 | 修改项目入口说明、启动方式或文档入口时               |
+| `config/`                 | `docs/config/overview.md`                        | 修改自定义配置边界、配置入口或配置依赖关系时         |
 | `package.json`            | `docs/workflows/development.md`                  | 修改 npm scripts、依赖、开发命令或运行流程时         |
 | `app/`                    | `docs/app/overview.md`                           | 修改页面结构、布局、路由约定或渲染策略时             |
 | `app/[category]/`         | `docs/app/routing.md`                            | 修改分类路由、动态路由参数或页面生成逻辑时           |

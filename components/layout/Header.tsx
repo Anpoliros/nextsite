@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { siteConfig } from '@/site.config';
+import { layoutConfig, uiConfig } from "@/config/layout";
+import { siteConfig } from "@/config/site";
 import HeaderActions from './HeaderActions';
 
 // 全局顶部导航栏组件
 export default function Header() {
   return (
     <header className="w-full border-b border-gray-200 dark:border-gray-800">
-      <div className={`${siteConfig.layout.headerContainer} mx-auto py-4`}>
+      <div className={`${layoutConfig.headerContainer} mx-auto py-4`}>
         {/* 宽屏布局与窄屏第一行 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
@@ -15,11 +16,11 @@ export default function Header() {
               {siteConfig.logo.startsWith('/') ? (
                 <Image src={siteConfig.logo} alt={siteConfig.title} width={32} height={32} className="rounded-sm" />
               ) : (
-                <span className={`${siteConfig.ui.fontSizes.headerLogo} font-bold`}>{siteConfig.logo}</span>
+                <span className={`${uiConfig.fontSizes.headerLogo} font-bold`}>{siteConfig.logo}</span>
               )}
             </Link>
             {/* 宽屏：导航链接放在Logo旁边 */}
-            <nav className={`hidden md:flex items-center gap-6 ${siteConfig.ui.fontSizes.headerNav} font-medium`}>
+            <nav className={`hidden md:flex items-center gap-6 ${uiConfig.fontSizes.headerNav} font-medium`}>
               {siteConfig.navLinks.map((link) => (
                 <Link
                   key={link.title}
@@ -39,7 +40,7 @@ export default function Header() {
         </div>
 
         {/* 窄屏第二行：导航链接放在下方并左对齐，增加间距 mt-6 */}
-        <nav className={`flex md:hidden items-center gap-6 ${siteConfig.ui.fontSizes.headerNav} mt-6 overflow-x-auto pb-2`}>
+        <nav className={`flex md:hidden items-center gap-6 ${uiConfig.fontSizes.headerNav} mt-6 overflow-x-auto pb-2`}>
           {siteConfig.navLinks.map((link) => (
             <Link
               key={link.title}

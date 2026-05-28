@@ -4,7 +4,8 @@ import Portals from "@/components/portals/Portals";
 import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
 import { getAllPosts } from "@/lib/posts/getposts";
-import { siteConfig } from "@/site.config";
+import { contentConfig } from "@/config/content";
+import { portalsConfig } from "@/config/portals";
 
 export default async function Home(props: { searchParams: Promise<{ page?: string }> }) {
   const searchParams = await props.searchParams;
@@ -23,23 +24,23 @@ export default async function Home(props: { searchParams: Promise<{ page?: strin
     tags: post.post_tag,
   }));
 
-  const pinnedSlugs = siteConfig.pinnedArticles || [];
+  const pinnedSlugs = contentConfig.pinnedArticles || [];
   const pinnedArticles = mappedPosts.filter(post => pinnedSlugs.includes(post.id));
 
-  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const limit = contentConfig.pagination?.articlesPerPage || 10;
   const totalPages = Math.ceil(mappedPosts.length / limit);
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   const timelineArticles = mappedPosts.slice(startIndex, endIndex);
 
   return (
-    <PageShell right={<Portals config={siteConfig.portals} variant="desktop" />}>
+    <PageShell right={<Portals config={portalsConfig} variant="desktop" />}>
       <div className="flex flex-col w-full">
         <Hero />
 
         {/* 窄屏 Portals：Hero 下、Pinned 上，全宽 */}
         <Portals
-          config={siteConfig.portals}
+          config={portalsConfig}
           variant="mobile"
           className="block md:hidden mb-12"
         />

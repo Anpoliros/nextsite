@@ -23,7 +23,7 @@ Markdown 模块的输入是去掉 frontmatter 后的 Markdown 字符串，输出
 - `components/shared/MarkdownEnhancer.tsx`：客户端事件委托，处理复制和折行。
 - `app/globals.css`：定义代码块和表格增强结构的全局样式，保证 HTML 字符串里的全局 class 稳定命中。
 - `components/shared/ArticleBody.module.css`：定义 notice 的局部样式。
-- `md.config.ts`：控制 GFM、代码高亮主题等配置。
+- `config/markdown.ts`：控制 GFM、代码高亮主题等配置。
 
 ## 数据模型
 
@@ -63,9 +63,9 @@ Markdown
   -> { html, toc }
 ```
 
-`mdConfig.features.enableHighlight` 关闭时，不会应用代码高亮增强，但表格增强仍会执行。
+`markdownConfig.features.enableHighlight` 关闭时，不会应用代码高亮增强，但表格增强仍会执行。
 
-`mdConfig.features.enableHeadingId` 关闭时，不会生成 heading id，也不会收集 TOC。
+`markdownConfig.features.enableHeadingId` 关闭时，不会生成 heading id，也不会收集 TOC。
 
 ## 自定义指令
 

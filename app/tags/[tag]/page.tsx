@@ -2,7 +2,7 @@ import ArticleList, { Article } from "@/components/shared/ArticleList";
 import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/posts/getposts";
-import { siteConfig } from "@/site.config";
+import { contentConfig } from "@/config/content";
 import PageShell from "@/components/layout/PageShell";
 
 export async function generateStaticParams() {
@@ -38,7 +38,7 @@ export default async function TagPage(props: {
     tags: post.post_tag,
   }));
 
-  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const limit = contentConfig.pagination?.articlesPerPage || 10;
   const totalPages = Math.ceil(allArticles.length / limit);
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;

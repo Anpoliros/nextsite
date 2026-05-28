@@ -14,7 +14,8 @@
 
 - `lib/posts/getposts.ts`：扫描内容目录、读取 frontmatter 和正文、生成文章索引。
 - `lib/posts/getpost.ts`：通过 `category` 和 `slug` 找到文章，并返回原始正文。
-- `md.config.ts`：定义 `contentDir` 和 Markdown 功能开关。
+- `config/content.ts`：定义 `contentDir`。
+- `config/markdown.ts`：定义 Markdown 功能开关。
 
 `getAllPosts()` 使用 React `cache()` 和模块级 `globalCache` 缓存结果。首次生成索引时会把 JSON 快照写入 `.logs/postindex_<timestamp>.json`，用于排查内容索引问题。正文会缓存在内存里，但日志快照只记录正文长度，避免生成过大的调试文件。
 
@@ -49,7 +50,7 @@ articles/content/<category>/<slug>.md
 - 修改 frontmatter 字段时，同步更新 `PostMeta`、页面层消费逻辑和本文档。
 - 修改摘要生成规则时，更新 `lib/markdown/excerpt.ts`；`getposts.ts` 只负责调用并缓存结果。
 - 修改排序规则时，检查首页、分类页、标签页和文章详情页的上一篇/下一篇逻辑。
-- 修改内容目录位置时，先改 `md.config.ts`，再检查同步脚本和部署命令。
+- 修改内容目录位置时，先改 `config/content.ts`，再检查同步脚本和部署命令。
 - 修改 `post_path` 规则时，必须同步检查路由、`ArticleList` 链接和 `generateStaticParams()`。
 - 不要在 `getposts.ts` 或 `getpost.ts` 中渲染 Markdown；页面层根据场景调用 `lib/markdown`。
 

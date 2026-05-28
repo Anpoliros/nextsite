@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getAllPosts } from "@/lib/posts/getposts";
-import { siteConfig } from "@/site.config";
+import { contentConfig } from "@/config/content";
 import PageShell from "@/components/layout/PageShell";
 
 export default function TagsPage() {
@@ -17,7 +17,7 @@ export default function TagsPage() {
   });
 
   const TagGroups = Object.keys(tagsByCategory).map(categoryKey => {
-    const categoryInfo = siteConfig.categories && siteConfig.categories[categoryKey];
+    const categoryInfo = contentConfig.categories && contentConfig.categories[categoryKey];
     const displayName = categoryInfo ? categoryInfo.name : categoryKey.toUpperCase();
     return {
       name: displayName,

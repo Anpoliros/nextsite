@@ -3,8 +3,8 @@ import Pagination from "@/components/shared/Pagination";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/posts/getposts";
 import Image from "next/image";
-import { siteConfig } from '@/site.config';
 import PageShell from "@/components/layout/PageShell";
+import { contentConfig } from "@/config/content";
 
 export async function generateStaticParams() {
   const { categories } = getAllPosts();
@@ -26,12 +26,12 @@ export default async function CategoryPage(props: {
     .filter(post => post.post_category === category)
     .sort((a, b) => b.post_timestamp - a.post_timestamp);
 
-  if (categoryPosts.length === 0 && (!siteConfig.categories || !(category in siteConfig.categories))) {
+  if (categoryPosts.length === 0 && (!contentConfig.categories || !(category in contentConfig.categories))) {
     notFound();
   }
 
-  const info = siteConfig.categories && category in siteConfig.categories
-    ? siteConfig.categories[category as keyof typeof siteConfig.categories]
+  const info = contentConfig.categories && category in contentConfig.categories
+    ? contentConfig.categories[category as keyof typeof contentConfig.categories]
     : null;
 
   const fallbackInfo = {
@@ -51,7 +51,7 @@ export default async function CategoryPage(props: {
     tags: post.post_tag,
   }));
 
-  const limit = siteConfig.pagination?.articlesPerPage || 10;
+  const limit = contentConfig.pagination?.articlesPerPage || 10;
   const totalPages = Math.ceil(allArticles.length / limit);
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;

@@ -1,4 +1,4 @@
-import { siteConfig } from "@/site.config";
+import { layoutConfig } from "@/config/layout";
 
 export default function PageShell({
   children,
@@ -10,7 +10,7 @@ export default function PageShell({
   return (
     <div
       className="md:grid gap-8 h-full w-full"
-      style={{ gridTemplateColumns: siteConfig.layout.gridTemplateColumns }}
+      style={{ gridTemplateColumns: layoutConfig.gridTemplateColumns }}
     >
       <section className="w-full flex-grow">{children}</section>
       <aside className="hidden md:block border-l border-gray-100 dark:border-gray-800 pl-8 h-full min-h-[500px]">

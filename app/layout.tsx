@@ -3,8 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { siteConfig } from "@/site.config";
 import { ThemeProvider } from "@/components/theme-provider";
+import { layoutConfig, uiConfig } from "@/config/layout";
+import { siteConfig } from "@/config/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,12 +37,12 @@ export default function RootLayout({
         <style dangerouslySetInnerHTML={{
           __html: `
             :root {
-              --site-bg: ${siteConfig.ui.themeColors.light.background};
-              --site-text: ${siteConfig.ui.themeColors.light.text};
+              --site-bg: ${uiConfig.themeColors.light.background};
+              --site-text: ${uiConfig.themeColors.light.text};
             }
             :root.dark {
-              --site-bg: ${siteConfig.ui.themeColors.dark.background};
-              --site-text: ${siteConfig.ui.themeColors.dark.text};
+              --site-bg: ${uiConfig.themeColors.dark.background};
+              --site-text: ${uiConfig.themeColors.dark.text};
             }
           `
         }} />
@@ -49,7 +50,7 @@ export default function RootLayout({
       <body className={`min-h-full flex flex-col transition-colors duration-300 bg-[var(--site-bg)] text-[var(--site-text)]`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
-          <main className={`${siteConfig.layout.mainContainer} flex-1 flex justify-start`}>
+          <main className={`${layoutConfig.mainContainer} flex-1 flex justify-start`}>
             {/* 70/30 grid 与右侧 aside 由各 page 自行通过 <PageShell> 决定 */}
             {children}
           </main>

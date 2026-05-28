@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Moon, Sun, Monitor, Languages, HelpCircle } from "lucide-react";
-import { siteConfig } from "@/site.config";
+import { uiConfig } from "@/config/layout";
 
 export default function HeaderActions() {
   const { theme, setTheme } = useTheme();
@@ -22,7 +22,7 @@ export default function HeaderActions() {
   };
 
   return (
-    <div className={`flex items-center gap-4 ${siteConfig.ui.fontSizes.headerActions} text-gray-600 dark:text-gray-300 min-h-[28px]`}>
+    <div className={`flex items-center gap-4 ${uiConfig.fontSizes.headerActions} text-gray-600 dark:text-gray-300 min-h-[28px]`}>
       <button 
         onClick={toggleTheme}
         className="hover:text-blue-500 hover:opacity-80 transition-colors p-1 flex items-center justify-center" 

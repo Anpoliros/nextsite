@@ -15,7 +15,8 @@ import type {
   MarkdownRenderResult,
   MarkdownTocItem,
 } from './types'
-import { mdConfig } from '@/md.config'
+import { contentConfig } from '@/config/content'
+import { markdownConfig } from '@/config/markdown'
 
 export type {
   MarkdownRenderOptions,
@@ -31,13 +32,13 @@ function buildProcessor(toc: MarkdownTocItem[], options: MarkdownRenderOptions =
     .use(remarkGfm)
     .use(remarkRehype, { allowDangerousHtml: true })
 
-  if (mdConfig.features.enableHeadingId) {
+  if (markdownConfig.features.enableHeadingId) {
     applyHeadingAnchors(processor, toc, { includeToc: options.includeToc })
   }
 
   applyNotices(processor)
 
-  if (mdConfig.features.enableHighlight) {
+  if (markdownConfig.features.enableHighlight) {
     applyHighlight(processor)
   }
 
@@ -68,7 +69,7 @@ export async function renderMarkdownContent(content: string): Promise<string> {
  * 读取 content/ 下的任意单文件并渲染（用于 about 等非索引页）
  */
 export async function getSinglePostContent(relativePath: string) {
-  const targetPath = path.join(mdConfig.contentDir, relativePath)
+  const targetPath = path.join(contentConfig.contentDir, relativePath)
 
   if (!fs.existsSync(targetPath)) {
     return null

@@ -19,15 +19,14 @@
 
 ## 数据模型
 
-布局主要由 `site.config.ts` 控制：
+布局主要由 `config/layout.ts`、`config/site.ts` 控制：
 
-- `layout.gridTemplateColumns`：`PageShell` 的桌面端左右列比例。
-- `layout.headerContainer`：顶部栏容器宽度和内边距。
-- `layout.mainContainer`：主内容容器宽度和页面内边距。
-- `ui.themeColors`：根布局注入的浅色/深色模式 CSS 变量。
-- `ui.fontSizes`：Header、Footer 等全局布局文字尺寸。
-- `hero`：首页 Hero 的背景图、标题、副标题、对齐、颜色和字号。
-- `navLinks`：顶部导航链接。
+- `layoutConfig.gridTemplateColumns`：`PageShell` 的桌面端左右列比例。
+- `layoutConfig.headerContainer`：顶部栏容器宽度和内边距。
+- `layoutConfig.mainContainer`：主内容容器宽度和页面内边距。
+- `uiConfig.themeColors`：根布局注入的浅色/深色模式 CSS 变量。
+- `uiConfig.fontSizes`：Header、Footer 等全局布局文字尺寸。
+- `siteConfig.navLinks`：顶部导航链接。
 
 ## Server/Client 边界
 
@@ -37,9 +36,9 @@
 
 ## 修改指南
 
-- 修改全局容器尺寸时，优先改 `siteConfig.layout`。
+- 修改全局容器尺寸时，优先改 `config/layout.ts`。
 - 新增页面右栏内容时，通过 `PageShell` 的 `right` prop 注入。
-- 修改主题颜色时，优先改 `siteConfig.ui.themeColors`，再检查 `app/globals.css` 中是否有固定颜色覆盖。
+- 修改主题颜色时，优先改 `config/layout.ts` 的 `uiConfig.themeColors`，再检查 `app/globals.css` 中是否有固定颜色覆盖。
 - 新增 Header 操作按钮时，如果需要事件处理，放在 `HeaderActions.tsx`。
 
 ## 验证方式

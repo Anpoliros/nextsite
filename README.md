@@ -21,7 +21,8 @@ npm run deploy
 │   └── tags
 │       └── [tag]
 ├── components/                # 公共组件
-├── lib/     
+├── config/                    # 站点自定义配置
+├── lib/
 │   └── markdown/              # md渲染器
 │       ├── codeblock.ts
 │       └── index.ts
@@ -30,15 +31,12 @@ npm run deploy
 │   ├── md_pic_remap.py        # md图片引用匹配工具
 │   └── png2jpg.py
 ├── ecosystem.config.js        # pm2配置
-├── md.config.ts               # md渲染配置
-├── site.config.ts             # 网站配置
 ├── package.json
 ├── tsconfig.json
 └── ZDEVLOG                    # 提示词日志
 ```
 
 ## 关键逻辑
-
 
 
 

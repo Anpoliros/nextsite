@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { cache } from 'react'
 import matter from 'gray-matter'
-import { mdConfig } from '@/md.config'
+import { contentConfig } from '@/config/content'
 import { extractMarkdownExcerpt } from '@/lib/markdown'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ function booleanFromFrontmatter(value: unknown): boolean {
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
 function scanPosts(): RawPost[] {
-  const contentDir = mdConfig.contentDir
+  const contentDir = contentConfig.contentDir
   return collectFiles(contentDir)
     .filter((filePath) => {
       // exclude files placed directly at content root (e.g. about.md)
@@ -96,7 +96,7 @@ function scanPosts(): RawPost[] {
 }
 
 function normalizePosts(raw: RawPost[]): PostMeta[] {
-  const contentDir = mdConfig.contentDir
+  const contentDir = contentConfig.contentDir
   return raw.map(({ filePath, content, frontmatter }, index) => {
     const rel = path.relative(contentDir, filePath)
     const category = rel.split(path.sep)[0]

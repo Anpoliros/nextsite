@@ -88,7 +88,7 @@ Web 模式下图片引用会输出为 `/images/<path>`，对应 Next.js 的 `pub
 
 ## 修改指南
 
-- 新增分类目录后，如果需要分类页展示名、描述或横幅，更新 `site.config.ts` 的 `categories`。
+- 新增分类目录后，如果需要分类页展示名、描述或横幅，更新 `config/content.ts` 的 `categories`。
 - 新增 frontmatter 字段后，如果页面要使用它，更新 `lib/posts/getposts.ts` 和 `docs/lib/posts.md`。
 - 新增正文指令后，同步更新 `lib/markdown/notices.ts`、`docs/lib/markdown.md` 和本文档。
 - 修改图片目录或 URL 规则时，同时检查 `package.json` 的 `sync-articles`、`scripts/md_pic_remap.py` 和本文档。

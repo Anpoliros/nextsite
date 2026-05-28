@@ -10,11 +10,11 @@
 
 | Route | File | Data Source | Notes |
 | --- | --- | --- | --- |
-| `/` | `app/page.tsx` | `getAllPosts()`、`siteConfig` | 首页时间线、置顶文章、Portals |
+| `/` | `app/page.tsx` | `getAllPosts()`、`contentConfig`、`portalsConfig` | 首页时间线、置顶文章、Portals |
 | `/about` | `app/about/page.tsx` | `getSinglePostContent()` | 单页内容，来自内容目录根文件 |
 | `/tags` | `app/tags/page.tsx` | `getAllPosts()` | 按分类聚合标签 |
 | `/tags/[tag]` | `app/tags/[tag]/page.tsx` | `getAllPosts()` | 标签文章列表，tag 需要 `decodeURIComponent` |
-| `/[category]` | `app/[category]/page.tsx` | `getAllPosts()`、`siteConfig.categories` | 分类文章列表 |
+| `/[category]` | `app/[category]/page.tsx` | `getAllPosts()`、`contentConfig.categories` | 分类文章列表 |
 | `/[category]/[slug]` | `app/[category]/[slug]/page.tsx` | `getPostBySlug()`、`renderMarkdownDocument()` | 文章详情页，可按 `showToc` 展示目录 |
 
 ## 静态参数
@@ -43,7 +43,7 @@ articles/content/<category>/<slug>.md
 ## 修改指南
 
 - 修改 URL 结构时，优先从 `PostMeta.post_path` 入手，并同步更新所有使用 `article.id` 或 `post_path` 的组件。
-- 修改分类展示信息时，改 `site.config.ts` 的 `categories`，不要在页面里硬编码分类文案。
+- 修改分类展示信息时，改 `config/content.ts` 的 `categories`，不要在页面里硬编码分类文案。
 - 修改标签路由时，注意 URL 编码和 `decodeURIComponent` 的对应关系。
 - 修改动态路由参数类型时，保留 Next.js 16 的 `params: Promise<...>` 和 `searchParams: Promise<...>` 写法。
 

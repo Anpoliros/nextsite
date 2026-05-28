@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { siteConfig } from "@/site.config";
+import { contentConfig } from "@/config/content";
 
 interface PaginationProps {
   totalPages: number;
@@ -10,7 +10,7 @@ interface PaginationProps {
 export default function Pagination({ totalPages, currentPage, basePath = "/" }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const prefetch = siteConfig.pagination?.prefetch;
+  const prefetch = contentConfig.pagination?.prefetch;
 
   // Calculate the page numbers to show
   const maxVisiblePages = 5;

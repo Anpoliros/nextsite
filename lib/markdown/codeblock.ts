@@ -1,6 +1,6 @@
 import rehypePrettyCode from 'rehype-pretty-code';
 import { visit } from 'unist-util-visit';
-import { mdConfig } from '@/md.config';
+import { markdownConfig } from "@/config/markdown";
 
 // ---- 辅助函数：提取语种 ----
 function extractLanguage(preNode: Record<string, unknown> | null): string {
@@ -109,8 +109,8 @@ export function applyHighlight(processor: unknown) {
   // @ts-expect-error bypass processor type check
   processor.use(rehypePrettyCode, {
     theme: {
-      light: mdConfig.features.codeThemeLight || "github-light",
-      dark: mdConfig.features.codeThemeDark || "github-dark",
+      light: markdownConfig.features.codeThemeLight || "github-light",
+      dark: markdownConfig.features.codeThemeDark || "github-dark",
     },
     keepBackground: true,
     defaultLang: {

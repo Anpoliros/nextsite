@@ -1,4 +1,4 @@
-import { siteConfig } from '@/site.config';
+import { heroConfig } from "@/config/hero";
 import Link from 'next/link';
 
 type HeroTheme = "light" | "dark";
@@ -26,8 +26,8 @@ const themeVisibility: Record<HeroTheme, string> = {
 };
 
 function renderSubtitle(theme: HeroTheme) {
-  const subtitle = siteConfig.hero.subtitle[theme];
-  const className = `${siteConfig.hero.fontSizes.subtitle} ${siteConfig.hero.colors.subtitle} transition-colors underline underline-offset-4 decoration-gray-400 hover:decoration-white font-medium block`;
+  const subtitle = heroConfig.subtitle[theme];
+  const className = `${heroConfig.fontSizes.subtitle} ${heroConfig.colors.subtitle} transition-colors underline underline-offset-4 decoration-gray-400 hover:decoration-white font-medium block`;
 
   if (!subtitle.link) {
     return <span className={className}>{subtitle.description}</span>;
@@ -41,12 +41,12 @@ function renderSubtitle(theme: HeroTheme) {
 }
 
 function renderContent(theme: HeroTheme) {
-  const alignment = alignClasses[siteConfig.hero.align[theme]];
+  const alignment = alignClasses[heroConfig.align[theme]];
 
   return (
     <div className={`${themeVisibility[theme]} relative z-10 px-4 ${alignment.content}`}>
-      <h1 className={`${siteConfig.hero.fontSizes.title} ${siteConfig.hero.colors.title} font-bold mb-4 tracking-tight`}>
-        {siteConfig.hero.title[theme]}
+      <h1 className={`${heroConfig.fontSizes.title} ${heroConfig.colors.title} font-bold mb-4 tracking-tight`}>
+        {heroConfig.title[theme]}
       </h1>
       {renderSubtitle(theme)}
     </div>
@@ -55,19 +55,19 @@ function renderContent(theme: HeroTheme) {
 
 // 首页顶部Hero图组件
 export default function Hero() {
-  const lightAlign = alignClasses[siteConfig.hero.align.light].frame;
-  const darkAlign = darkAlignClasses[siteConfig.hero.align.dark];
+  const lightAlign = alignClasses[heroConfig.align.light].frame;
+  const darkAlign = darkAlignClasses[heroConfig.align.dark];
 
   return (
-    <div className={`relative w-full ${siteConfig.hero.aspectRatio} bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden mb-12 flex flex-col justify-center ${lightAlign} ${darkAlign}`}>
+    <div className={`relative w-full ${heroConfig.aspectRatio} bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden mb-12 flex flex-col justify-center ${lightAlign} ${darkAlign}`}>
       {/* 背景图：通过内联样式支持明暗模式分离图片设置 */}
       <div 
         className="absolute inset-0 bg-cover bg-center hidden dark:block"
-        style={{ backgroundImage: `url('${siteConfig.hero.bg.dark}')` }}
+        style={{ backgroundImage: `url('${heroConfig.bg.dark}')` }}
       ></div>
       <div 
         className="absolute inset-0 bg-cover bg-center block dark:hidden"
-        style={{ backgroundImage: `url('${siteConfig.hero.bg.light}')` }}
+        style={{ backgroundImage: `url('${heroConfig.bg.light}')` }}
       ></div>
       
       {renderContent("light")}
