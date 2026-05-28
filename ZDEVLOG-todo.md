@@ -1,7 +1,65 @@
 # TODO
 
+fix
+- [ ] favicon混乱问题
+- [ ] 返回时滚动位置错误
+- [ ] webhook secret不应写死在代码里
+- [ ] 图标会随cmd+而变粗
 
-# !important
+feat
+- [x] 自定义组件支持
+    - [x] <!--copyright-notice-->
+    - [x] <!--spoiler-alert-->
+    - [ ] <!--link-card-->超链接卡片
+    - [ ] 目录作为组件
+- [x] gitea钩子自动构建
+- [ ] 随机一篇的逻辑有问题，而且应该同时放在头部。可以随机到锚点
+- [ ] 数学公式支持
+- [ ] 不加载图片的选择
+- [ ] 目录作为组件，可以随意放置
+- [ ] 目录需要统计一级标题 mcpsok
+- [ ] 目录默认折叠可配置
+- [ ] 目录自动应用在某category上 构建方式 脚本方式
+
+ui
+- [ ] 重新设计articlelist表项
+- [ ] 点击超链接时的反馈
+- [ ] 响应速度 动画 加载进度条 翻页体验
+- [ ] 底部回到主页
+- [ ] 回到顶部按钮
+- [ ] 底部显示构建版本
+- [ ] 错误页面 status页面
+
+refactor
+- [ ] 重构配置
+
+
+# 长期
+
+[ ] Z-index。也许可以通过zindex来实现更有阻尼感的滑动，https://ashorthike.com
+
+
+
+# 兼容性问题
+
+我们来研究一下兼容性相关的问题。
+
+1. 按钮失效
+在dev服务器和部分旧版本设备上，包括header和codeblock中的按钮会不生效
+
+2. css失效
+在微信webview和
+
+postcss？
+
+
+
+
+
+
+
+
+# 存档
 
 [x] 文章页面的tag应该可点击
 [x] category和tag放到一处，而且顶部和底部都有
@@ -36,63 +94,6 @@ postPaths: string[]
 const random = postPaths[Math.floor(Math.random() * postPaths.length)]
 
 必须在 client component + useEffect 或 render 时选
-
-
-
-
-# 架构
-
-[] about和[slug]采用的仍然是两个函数getSinglePostContent、getPostBySlug，应该统一
-
-## mdx支持
-我们的渲染引擎现在支持mdx吗？我想让一个页面具有以下以下功能：
-
-有一个能够折叠的选择列表，表项是shiki主题。选择其中的一个主题后，就将这个页面的codeblock的shiki主题修改过去。
-
-为了支持这个页面，我们需要做哪些工作
----
-
-那如果支持mdx了，mdx能轻松实现目标需求吗？引入mdx需要如何重构，能在现有的lib/markdown中扩展以实现吗
----
-
-
-
-
-
-
-
-# 长期
-
-[] 目录
-
-[] 错误页面
-
-[] status页面
-
-
-# footer
-
-上次构建时间 服务请求次数
-
-
-
-# 兼容性问题
-
-我们来研究一下兼容性相关的问题。
-
-1. 按钮失效
-在dev服务器和部分旧版本设备上，包括header和codeblock中的按钮会不生效
-
-2. css失效
-在微信webview和
-
-postcss？
-
-
-
-# Z-index
-
-也许可以通过zindex来实现更有阻尼感的滑动，https://ashorthike.com
 
 
 

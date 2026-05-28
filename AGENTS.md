@@ -3,41 +3,20 @@
 ## 项目说明
 这个项目是一个基于next.js的个人网站。
 
-- app/ 页面
-- components/ 组件
-- lib/
-    - markdown/ 渲染
-- docs/ 
-- node_modules/next/dist/docs/ 框架自带的文档
+## 规范
 
-
-
-## 代码编写要求
-你在编写和重构时需要遵循以下要求：
-
-### 结构安排
-- 符合typescript框架的规范
+- 符合typescript框架的规范和最佳实践
 - 重视复用，不写冗长的文件
-
-### 注释
 - 关键部位简要**中文**注释，语言风格清晰、现代
+- 注意依赖版本
 
-### 技术栈
-* Next.js 16
-* Tailwind CSS 4
-其他依赖需要根据package.json判断版本。
-
-
-
-## 文档维护规范
+## 文档
 
 - 修改核心模块、公共接口、数据模型、构建流程或部署流程时，必须检查 `docs/`。
 - 开始修改前，优先查看 `docs/MAP.md`，确认源码路径对应的文档。
 - 文档写作、模板和更新规则见 `docs/SPEC.md`。
-```
+- next.js的文档在`node_modules/next/dist/docs/`中，按需查看
 
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# grill-me
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+如果我的需求不够清晰、不符合最佳实践，不要盲目执行，停下来，告诉我。

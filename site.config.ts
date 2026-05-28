@@ -97,7 +97,7 @@ export const siteConfig = {
       },
     },
     colors: {
-      title: "text-white dark:text-white",
+      title: "text-black dark:text-white",
       subtitle: "text-gray-500 dark:text-gray-300",
     },
     fontSizes: {
@@ -143,8 +143,8 @@ export const siteConfig = {
     },
     portals: {
       git:    { href: "https://git.anpoliros.com",   logo: "/logos/gitea.svg",    label: "Git" },
-      vsss:   { href: "https://vsss.anpoliros.com",         logo: "/logos/441.png",   label: "VSSS" },
-      status: { href: "https://status.anpoliros.com",  logo: "/logos/285.png", label: "Status" },
+      vsss:   { href: "https://vsss.anpoliros.com",         logo: "/logos/win7-monitor.png",   label: "VSSS" },
+      status: { href: "https://status.anpoliros.com",  logo: "/logos/win7-status.png", label: "Status" },
     },
     placements: {
       desktop: [
@@ -158,6 +158,6 @@ export const siteConfig = {
         { portal: "status", row: 1, col: 4 },
       ],
     },
-    item: { touchScale: 0.8, logoScale: 0.6 },
+    item: { touchScale: 0.8, logoScale: 0.5 },
   } satisfies PortalsConfig,
 };
