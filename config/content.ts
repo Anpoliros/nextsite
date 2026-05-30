@@ -34,7 +34,7 @@ export const contentConfig = {
 
   // 置顶文章
   pinnedArticles: [
-    "speaking/freedom", // 可以加入你实际的文章 slug，比如 'walking/hello' 等
+    "about"// 可以加入你实际的文章 slug，比如 'walking/hello' 等
   ],
 
   // 分页设置

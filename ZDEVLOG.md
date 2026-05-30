@@ -38,3 +38,13 @@
 开一个新分支refactor/config，就按这个边界来。不需考虑旧版兼容。只调整config位置，不调整config具体schema。
 
 需要运行命令时，在tmux:codex会话中执行。需要debug时，在3000端口开dev服务器。你可以自行commit用来diff。
+
+
+
+
+
+
+
+
+
+

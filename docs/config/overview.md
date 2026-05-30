@@ -11,7 +11,7 @@
 | File | Responsibility |
 | --- | --- |
 | `config/site.ts` | 站点标题、描述、Logo、导航和页脚文案 |
-| `config/layout.ts` | 全局布局尺寸、主题基础色和布局字号 |
+| `config/layout.ts` | 全局布局尺寸、主题基础色、布局字号和展示型组件 UI 参数 |
 | `config/content.ts` | 内容根目录、分类展示、置顶文章和分页设置 |
 | `config/markdown.ts` | Markdown 渲染功能开关和代码高亮主题 |
 | `config/hero.ts` | 首页 Hero 背景、文案、对齐、颜色和字号 |
@@ -31,7 +31,7 @@ import { contentConfig } from "@/config/content";
 ## 修改指南
 
 - 修改站点品牌、导航或页脚时，优先看 `config/site.ts`。
-- 修改容器宽度、左右栏比例、主题基础色或全局字号时，优先看 `config/layout.ts`。
+- 修改容器宽度、左右栏比例、主题基础色、全局字号或列表展示参数时，优先看 `config/layout.ts`。
 - 修改内容目录、分类页展示、置顶文章或分页规则时，优先看 `config/content.ts`。
 - 修改 Markdown pipeline 开关、代码高亮主题或代码块配置时，优先看 `config/markdown.ts`。
 - 修改首页 Hero 时，优先看 `config/hero.ts`。

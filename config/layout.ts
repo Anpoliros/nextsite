@@ -8,6 +8,10 @@ export const layoutConfig = {
 
 export const uiConfig = {
   categoryBannerAspectRatio: "aspect-[4/1]",
+  articleList: {
+    // ArticleList 中每篇文章最多展示的标签数
+    maxTags: 3,
+  },
   // 网站主题基础颜色：在这里直接定义 Hex / RGB 颜色值
   themeColors: {
     light: {

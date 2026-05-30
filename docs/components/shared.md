@@ -27,8 +27,14 @@
 | `title` | 展示标题 |
 | `excerpt` | 摘要文本，来自 `PostMeta.post_excerpt`，为空时页面层使用 `暂无简介` |
 | `date` | 日期字符串 |
-| `category` | 分类名 |
-| `tags` | 标签数组 |
+| `category` | 分类名，当前列表项不直接展示 |
+| `tags` | 标签数组，列表项按 `uiConfig.articleList.maxTags` 截断展示 |
+
+`ArticleList` 交互规则：
+
+- 桌面端左侧文章信息区链接到文章详情，右侧标签分别链接到标签页。
+- 移动端上方文章信息区链接到文章详情，下方标签左对齐展示。
+- 列表项不渲染分类名，标签保留原始大小写。
 
 `Pagination` props：
 
@@ -48,6 +54,7 @@
 ## 修改指南
 
 - 修改 `Article` 字段时，同步检查首页、分类页和标签页的映射逻辑。
+- 修改 `ArticleList` 标签展示上限时，优先调整 `config/layout.ts` 中的 `uiConfig.articleList.maxTags`。
 - 修改分页 URL 规则时，同步检查 `app/page.tsx`、`app/[category]/page.tsx` 和 `app/tags/[tag]/page.tsx`。
 - 修改 `MarkdownEnhancer` 的选择器时，同步检查 `lib/markdown/codeblock.ts`、`lib/markdown/table.ts` 和 `app/globals.css`。
 - 修改 notice 生成 HTML 的 className 时，同步更新 `ArticleBody.module.css`。
