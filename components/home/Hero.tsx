@@ -1,8 +1,10 @@
-import { heroConfig } from "@/config/hero";
+import { homeConfig } from "@/config/home";
 import Link from 'next/link';
 
 type HeroTheme = "light" | "dark";
 type HeroAlign = "left" | "right";
+
+const heroConfig = homeConfig.hero;
 
 const alignClasses: Record<HeroAlign, { frame: string; content: string }> = {
   left: {
