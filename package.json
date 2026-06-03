@@ -8,6 +8,7 @@
     "build": "npm run sync-articles && next build",
     "start": "npm run sync-articles && next start",
     "deploy": "scripts/deploy_articles.sh",
+    "ascii:preview": "node scripts/ascii-preview.mjs",
     "hook:articles": "node scripts/articles_webhook.mjs",
     "hook:deploy-articles": "scripts/deploy_articles.sh",
     "stop": "pm2 stop nextsite",

@@ -16,6 +16,7 @@
 | `AGENTS.md`               | `docs/README.md`, `docs/SPEC.md`, `docs/init.md` | 修改 coding agent 工作规则、文档接入方式或项目约束时 |
 | `README.md`               | `docs/README.md`                                 | 修改项目入口说明、启动方式或文档入口时               |
 | `config/`                 | `docs/config/overview.md`                        | 修改自定义配置边界、配置入口或配置依赖关系时         |
+| `config/ascii.ts`         | `docs/lib/ascii.md`, `docs/config/overview.md`   | 修改字符画转换默认参数或字符集时                     |
 | `package.json`            | `docs/workflows/development.md`                  | 修改 npm scripts、依赖、开发命令或运行流程时         |
 | `app/`                    | `docs/app/overview.md`                           | 修改页面结构、布局、路由约定或渲染策略时             |
 | `app/[category]/`         | `docs/app/routing.md`                            | 修改分类路由、动态路由参数或页面生成逻辑时           |
@@ -27,6 +28,7 @@
 | `components/portals/`     | `docs/components/portals.md`                     | 修改弹层、传送门或跨层级渲染行为时                   |
 | `components/shared/`      | `docs/components/shared.md`                      | 修改共享组件接口、样式约定或复用边界时               |
 | `lib/`                    | `docs/lib/overview.md`                           | 修改核心工具、数据流、模块边界或共享类型时           |
+| `lib/ascii/`              | `docs/lib/ascii.md`                              | 修改字符画转换接口、输入适配或产物格式时             |
 | `lib/markdown/`           | `docs/lib/markdown.md`                           | 修改 Markdown 解析、渲染、代码高亮或扩展语法时       |
 | `lib/posts/`              | `docs/lib/posts.md`                              | 修改文章读取、frontmatter、排序、分类或标签模型时    |
 | `articles/content/`       | `docs/content/articles.md`                       | 修改文章内容结构、frontmatter 约定或内容组织方式时   |
@@ -34,6 +36,7 @@
 | `public/images/`          | `docs/content/assets.md`                         | 修改站点图片产物、静态资源路径或图片引用规则时       |
 | `public/logos/`           | `docs/content/assets.md`                         | 修改品牌资源、图标资源或静态资源约定时               |
 | `scripts/`                | `docs/workflows/scripts.md`                      | 修改工程脚本、内容同步脚本或自动化流程时             |
+| `scripts/ascii-preview.mjs` | `docs/lib/ascii.md`, `docs/workflows/scripts.md` | 修改字符画终端预览入口或参数解析时                   |
 | `scripts/md_pic_remap.py` | `docs/workflows/content-sync.md`                 | 修改 Markdown 图片重写、图片路径规则或内容同步产物时 |
 | `next.config.*`           | `docs/workflows/build.md`                        | 修改 Next.js 配置、构建行为或运行时配置时            |
 | `postcss.config.*`        | `docs/workflows/styling.md`                      | 修改 Tailwind CSS、PostCSS 或样式编译流程时          |

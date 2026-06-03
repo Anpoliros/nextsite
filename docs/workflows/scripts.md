@@ -59,6 +59,19 @@ npm run hook:articles
 npm run hook:deploy-articles
 ```
 
+## ASCII 图片预览
+
+`scripts/ascii-preview.mjs` 用于在终端中预览图片转字符画效果。它读取 `config/ascii.ts` 的默认列数、最大行数、字符集、反色和抖动参数，并通过 `sharp` 解码 JPG、PNG、SVG、WebP 等常见图片格式。
+
+常用入口：
+
+```sh
+npm run ascii:preview -- public/bg-alice.jpeg
+npm run ascii:preview -- public/file.svg --columns 72 --invert
+npm run ascii:preview -- public/bg-alice.jpeg --contrast 5 --dither
+npm run ascii:preview -- --charsets
+```
+
 ## 维护规则
 
 - 修改脚本入口时，同步更新 `package.json`。
