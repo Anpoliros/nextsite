@@ -15,7 +15,6 @@
 | `config/content.ts` | 内容根目录、分类展示、置顶文章和分页设置 |
 | `config/markdown.ts` | Markdown 渲染功能开关和代码高亮主题 |
 | `config/home.ts` | 首页 Hero、字符背景、文案、对齐、颜色和字号 |
-| `config/ascii.ts` | 字符画转换默认精细度、字符集和终端预览参数 |
 | `config/portals.ts` | Portals 面板数据、网格、入口和摆放位置 |
 
 ## 实现视角
@@ -36,7 +35,6 @@ import { contentConfig } from "@/config/content";
 - 修改内容目录、分类页展示、置顶文章或分页规则时，优先看 `config/content.ts`。
 - 修改 Markdown pipeline 开关、代码高亮主题或代码块配置时，优先看 `config/markdown.ts`。
 - 修改首页 Hero 或字符背景时，优先看 `config/home.ts`。
-- 修改字符画转换默认参数或字符集时，优先看 `config/ascii.ts`。
 - 修改 Portals 入口时，优先看 `config/portals.ts`，并保留 `PortalsConfig` 的静态校验。
 
 ## 验证方式

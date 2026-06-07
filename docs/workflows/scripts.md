@@ -67,6 +67,8 @@ npm run hook:deploy-articles
 
 ```sh
 npm run ascii:preview -- public/bg-alice.jpeg
+npm run ascii:preview -- public/temp/IMG_7324.jpeg --config shell
+npm run ascii:preview -- public/temp/IMG_7324.jpeg --config shell --contrast 5 --print-config
 npm run ascii:preview -- public/file.svg --columns 72 --invert
 npm run ascii:preview -- public/bg-alice.jpeg --contrast 5 --dither
 npm run ascii:preview -- public/images/cloud.jpg --background "#fff" --background-variance 160

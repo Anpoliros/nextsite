@@ -16,7 +16,6 @@
 | `AGENTS.md`               | `docs/README.md`, `docs/SPEC.md`, `docs/init.md` | 修改 coding agent 工作规则、文档接入方式或项目约束时 |
 | `README.md`               | `docs/README.md`                                 | 修改项目入口说明、启动方式或文档入口时               |
 | `config/`                 | `docs/config/overview.md`                        | 修改自定义配置边界、配置入口或配置依赖关系时         |
-| `config/ascii.ts`         | `docs/lib/ascii.md`, `docs/config/overview.md`   | 修改字符画转换默认参数或字符集时                     |
 | `package.json`            | `docs/workflows/development.md`                  | 修改 npm scripts、依赖、开发命令或运行流程时         |
 | `app/`                    | `docs/app/overview.md`                           | 修改页面结构、布局、路由约定或渲染策略时             |
 | `app/[category]/`         | `docs/app/routing.md`                            | 修改分类路由、动态路由参数或页面生成逻辑时           |
@@ -29,6 +28,7 @@
 | `components/shared/`      | `docs/components/shared.md`                      | 修改共享组件接口、样式约定或复用边界时               |
 | `lib/`                    | `docs/lib/overview.md`                           | 修改核心工具、数据流、模块边界或共享类型时           |
 | `lib/ascii/`              | `docs/lib/ascii.md`                              | 修改字符画转换接口、输入适配或产物格式时             |
+| `lib/ascii/configs/`      | `docs/lib/ascii.md`                              | 修改字符画配置模型、默认配置或命名 profile 时        |
 | `lib/markdown/`           | `docs/lib/markdown.md`                           | 修改 Markdown 解析、渲染、代码高亮或扩展语法时       |
 | `lib/posts/`              | `docs/lib/posts.md`                              | 修改文章读取、frontmatter、排序、分类或标签模型时    |
 | `articles/content/`       | `docs/content/articles.md`                       | 修改文章内容结构、frontmatter 约定或内容组织方式时   |
