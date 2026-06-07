@@ -2,6 +2,7 @@
 
 # content
 /public/images
+/public/temp
 
 # 忽略 content 下所有内容
 content/*

@@ -4,6 +4,10 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function clampByte(value: number) {
+  return Math.round(clamp(value, 0, 255));
+}
+
 function normalizeCharset(charset: AsciiRenderOptions["charset"]) {
   const chars = Array.isArray(charset) ? charset : Array.from(charset);
 
@@ -43,12 +47,13 @@ function getPercentile(sortedValues: number[], percentile: number) {
   return sortedValues[index] ?? 0;
 }
 
-function normalizeLevels(values: number[], options: RequiredAsciiOptions) {
+function normalizeLevels(values: number[], options: RequiredAsciiOptions, grid: LuminanceGrid) {
   if (!options.autoLevels.enabled || values.length === 0) {
     return values;
   }
 
-  const sortedValues = [...values].sort((left, right) => left - right);
+  const visibleValues = values.filter((_, index) => getMaskChar(grid, index, options) === undefined);
+  const sortedValues = (visibleValues.length > 0 ? visibleValues : values).sort((left, right) => left - right);
   const low = getPercentile(sortedValues, options.autoLevels.lowPercentile);
   const high = getPercentile(sortedValues, options.autoLevels.highPercentile);
 
@@ -62,8 +67,20 @@ function normalizeLevels(values: number[], options: RequiredAsciiOptions) {
 }
 
 function prepareLuminanceValues(grid: LuminanceGrid, options: RequiredAsciiOptions) {
-  const values = Array.from({ length: grid.width * grid.height }, (_, index) => grid.data[index] ?? 0);
-  const leveledValues = normalizeLevels(values, options);
+  const values = Array.from({ length: grid.width * grid.height }, (_, index) => {
+    const value = grid.data[index] ?? 0;
+    const alpha = grid.alpha?.[index] ?? 255;
+
+    if (!options.alpha.enabled || options.alpha.mode !== "density" || alpha <= options.alpha.threshold) {
+      return value;
+    }
+
+    const alphaRatio = clamp(alpha / 255, 0, 1);
+    const emptyLuminance = options.invert ? 255 : 0;
+
+    return value * alphaRatio + emptyLuminance * (1 - alphaRatio);
+  });
+  const leveledValues = normalizeLevels(values, options, grid);
 
   return leveledValues.map((value) => adjustGamma(adjustContrast(value, options.contrast), options.gamma));
 }
@@ -75,6 +92,24 @@ function luminanceToCharIndex(value: number, charCount: number, invert: boolean)
   return clamp(Math.round(visualValue * (charCount - 1)), 0, charCount - 1);
 }
 
+function getMaskChar(grid: LuminanceGrid, index: number, options: RequiredAsciiOptions) {
+  const alpha = grid.alpha?.[index];
+
+  if (options.alpha.enabled && alpha !== undefined && alpha <= options.alpha.threshold) {
+    return options.alpha.emptyChar;
+  }
+
+  if (options.background.enabled && grid.backgroundMask?.[index]) {
+    return options.background.emptyChar;
+  }
+
+  return undefined;
+}
+
+function finishRow(row: string, options: RequiredAsciiOptions) {
+  return options.trimTrailingWhitespace ? row.trimEnd() : row;
+}
+
 function renderWithoutDither(grid: LuminanceGrid, chars: string[], options: RequiredAsciiOptions) {
   const values = prepareLuminanceValues(grid, options);
   const rows: string[] = [];
@@ -84,10 +119,12 @@ function renderWithoutDither(grid: LuminanceGrid, chars: string[], options: Requ
 
     for (let x = 0; x < grid.width; x += 1) {
       const offset = y * grid.width + x;
-      row += chars[luminanceToCharIndex(values[offset] ?? 0, chars.length, options.invert)];
+      const maskChar = getMaskChar(grid, offset, options);
+
+      row += maskChar ?? chars[luminanceToCharIndex(values[offset] ?? 0, chars.length, options.invert)];
     }
 
-    rows.push(row.trimEnd());
+    rows.push(finishRow(row, options));
   }
 
   return rows.join("\n");
@@ -111,6 +148,13 @@ function renderWithDither(grid: LuminanceGrid, chars: string[], options: Require
 
     for (let x = 0; x < grid.width; x += 1) {
       const offset = y * grid.width + x;
+      const maskChar = getMaskChar(grid, offset, options);
+
+      if (maskChar !== undefined) {
+        row += maskChar;
+        continue;
+      }
+
       const current = values[offset] ?? 0;
       const charIndex = luminanceToCharIndex(current, chars.length, options.invert);
       const quantized = (charIndex / (chars.length - 1)) * 255;
@@ -126,7 +170,7 @@ function renderWithDither(grid: LuminanceGrid, chars: string[], options: Require
       spreadError(x + 1, y + 1, error, 1 / 16);
     }
 
-    rows.push(row.trimEnd());
+    rows.push(finishRow(row, options));
   }
 
   return rows.join("\n");
@@ -138,6 +182,17 @@ type RequiredAsciiOptions = Required<Pick<AsciiRenderOptions, "contrast" | "gamm
     lowPercentile: number;
     highPercentile: number;
   };
+  alpha: {
+    enabled: boolean;
+    mode: "threshold" | "density";
+    threshold: number;
+    emptyChar: string;
+  };
+  background: {
+    enabled: boolean;
+    emptyChar: string;
+  };
+  trimTrailingWhitespace: boolean;
 };
 
 export function renderLuminanceGridToAscii(grid: LuminanceGrid, options: AsciiRenderOptions) {
@@ -156,6 +211,17 @@ export function renderLuminanceGridToAscii(grid: LuminanceGrid, options: AsciiRe
       lowPercentile: options.autoLevels?.lowPercentile ?? 0.02,
       highPercentile: options.autoLevels?.highPercentile ?? 0.98,
     },
+    alpha: {
+      enabled: options.alpha?.enabled ?? false,
+      mode: options.alpha?.mode ?? "threshold",
+      threshold: clampByte(options.alpha?.threshold ?? 0),
+      emptyChar: options.alpha?.emptyChar ?? " ",
+    },
+    background: {
+      enabled: options.background?.enabled ?? false,
+      emptyChar: options.background?.emptyChar ?? " ",
+    },
+    trimTrailingWhitespace: options.trimTrailingWhitespace ?? true,
   };
 
   return resolvedOptions.dither
