@@ -36,6 +36,7 @@
 | `public/images/`          | `docs/content/assets.md`                         | 修改站点图片产物、静态资源路径或图片引用规则时       |
 | `public/logos/`           | `docs/content/assets.md`                         | 修改品牌资源、图标资源或静态资源约定时               |
 | `scripts/`                | `docs/workflows/scripts.md`                      | 修改工程脚本、内容同步脚本或自动化流程时             |
+| `scripts/sync_articles.sh` | `docs/workflows/content-sync.md`                | 修改内容仓库更新、图片同步或 Markdown 重写流程时      |
 | `scripts/ascii-preview.mjs` | `docs/lib/ascii.md`, `docs/workflows/scripts.md` | 修改字符画终端预览入口或参数解析时                   |
 | `scripts/md_pic_remap.py` | `docs/workflows/content-sync.md`                 | 修改 Markdown 图片重写、图片路径规则或内容同步产物时 |
 | `next.config.*`           | `docs/workflows/build.md`                        | 修改 Next.js 配置、构建行为或运行时配置时            |

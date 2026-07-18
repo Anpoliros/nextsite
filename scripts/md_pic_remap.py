@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+26.7.18
 智能处理 Markdown 文件中的图片引用
 
 功能：
@@ -24,11 +25,27 @@ from typing import Dict, List, Tuple, Optional
 
 class ImagePathMatcher:
     """图片路径匹配器，使用字典树(Trie)实现高效的最长匹配"""
+
+    SEPARATOR_PATTERN = re.compile(r'[-_]+')
     
     def __init__(self):
         self.images = {}  # 存储 {相对路径: 绝对路径}
         self.path_parts_map = {}  # 存储 {路径部分: [完整路径列表]} 用于快速查找
         self.no_ext_map = {}  # 存储 {不带扩展名的路径: [完整路径列表]} 用于无扩展名匹配
+        self.separator_alias_map = {}  # 将文件名中的 - 和 _ 视为等价分隔符
+        self.separator_no_ext_alias_map = {}
+
+    @classmethod
+    def normalize_separators(cls, path: str) -> str:
+        """统一文件名分隔符，仅用于兜底匹配。"""
+        return cls.SEPARATOR_PATTERN.sub('-', path)
+
+    @staticmethod
+    def add_to_index(index: Dict[str, List[str]], key: str, image_path: str):
+        """向多值索引追加路径，并避免同一图片重复进入候选列表。"""
+        candidates = index.setdefault(key, [])
+        if image_path not in candidates:
+            candidates.append(image_path)
     
     def add_image(self, relative_path: str, absolute_path: str):
         """添加图片路径到索引"""
@@ -53,6 +70,28 @@ class ImagePathMatcher:
         if path_no_ext not in self.no_ext_map:
             self.no_ext_map[path_no_ext] = []
         self.no_ext_map[path_no_ext].append(relative_path)
+
+        # 为每层路径后缀建立分隔符别名，兼容 foo-bar 与 foo_bar。
+        path_parts = relative_path.split('/')
+        for index in range(len(path_parts)):
+            suffix = '/'.join(path_parts[index:])
+            normalized_suffix = self.normalize_separators(suffix)
+            self.add_to_index(self.separator_alias_map, normalized_suffix, relative_path)
+
+            suffix_no_ext = os.path.splitext(suffix)[0]
+            normalized_no_ext = self.normalize_separators(suffix_no_ext)
+            self.add_to_index(
+                self.separator_no_ext_alias_map,
+                normalized_no_ext,
+                relative_path,
+            )
+
+    @staticmethod
+    def get_unique_match(candidates: Optional[List[str]]) -> Optional[str]:
+        """仅返回唯一候选，避免分隔符归一化后误选同名图片。"""
+        if candidates and len(candidates) == 1:
+            return candidates[0]
+        return None
     
     def find_best_match(self, image_ref: str) -> Optional[str]:
         """
@@ -135,8 +174,25 @@ class ImagePathMatcher:
                         if match.lower().endswith(ext):
                             return match
                 return matches[0]
+
+        # 4. 将 - 和 _ 视为等价分隔符；有多个候选时不自动猜测。
+        for candidate in candidates_to_try:
+            normalized_candidate = self.normalize_separators(candidate)
+            alias_match = self.get_unique_match(
+                self.separator_alias_map.get(normalized_candidate)
+            )
+            if alias_match:
+                return alias_match
+
+            candidate_no_ext = os.path.splitext(candidate)[0]
+            normalized_no_ext = self.normalize_separators(candidate_no_ext)
+            alias_match = self.get_unique_match(
+                self.separator_no_ext_alias_map.get(normalized_no_ext)
+            )
+            if alias_match:
+                return alias_match
         
-        # 4. 尝试文件名匹配（如果引用中没有路径，或者之前的匹配都失败了）
+        # 5. 尝试文件名匹配（如果引用中没有路径，或者之前的匹配都失败了）
         filename = os.path.basename(image_ref)
         
         # 先尝试带扩展名的文件名匹配
@@ -178,7 +234,7 @@ class ImagePathMatcher:
             
             return min(candidates, key=lambda x: len(x))
         
-        # 5. 尝试包含匹配（查找包含该引用的所有路径，选择最长匹配）
+        # 6. 尝试包含匹配（查找包含该引用的所有路径，选择最长匹配）
         for candidate in candidates_to_try:
             for image_path in self.images.keys():
                 if candidate in image_path:

@@ -4,7 +4,9 @@
 
 ## 内容同步
 
-`scripts/md_pic_remap.py` 负责扫描图片目录，并将 Markdown 中的本地图片引用重写为 Web 可访问路径。
+`scripts/sync_articles.sh` 是内容同步入口，负责更新 `articles` 仓库、同步静态图片，并调用 `scripts/md_pic_remap.py` 将 Markdown 中的本地图片引用重写为 Web 可访问路径。
+
+图片匹配优先使用完整路径和文件名，也支持省略扩展名以及 `-`、`_` 分隔符混用。分隔符归一化后出现多个候选时，脚本会跳过该引用，避免写入错误路径。
 
 常用入口：
 

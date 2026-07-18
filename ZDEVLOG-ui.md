@@ -208,6 +208,61 @@ body > main
 
 ---
 
-对“边界线”的额外优化，识别跳变，强化边界
 
 JPG jpg jpeg PNG png这种别名也要支持
+
+
+好，那我们为lib/ascii增加以下功能
+
+1. 支持png，JPG jpg jpeg PNG png这种别名也要支持，webp也需要支持
+
+2. 支持alpha，透明度截断和参与计算两种模式
+
+3. 支持背景色抠图，这个和alpha不要放在一起。除了直接匹配颜色抠图，再定义一个允许的方差范围，即接近白色的也抠掉
+
+4. alpha和background的emptychar分别定义，互不影响，二者可以共存
+
+5. 尾部空格截断也加上
+
+
+
+我们讨论一下配置
+
+由于配置越来越多，我觉得可以这样解决配置膨胀问题：
+
+将ascii的配置移动到lib/ascii/configs，
+例如
+lib/ascii/configs/
+  example.ts  # 解释了所有能配置的东西，相当于readme
+  type.ts     # 配置数据模型
+  default.ts  # 不指定任何参数时的配置
+  shell.ts    # 用户自定义配置，通过--config参数使用
+
+用户可以这么使用
+npm run ascii:preview -- public/temp/IMG_7324.jpeg --config shell
+
+用户还可以覆盖参数，继续追加的命令行参数将覆盖配置中的参数，
+例如
+shell.ts中定义invert:true contrast:3
+用户执行
+npm run ascii:preview -- public/temp/IMG_7324.jpeg --config shell --invert --contrast 5
+实际参数
+invert:true contrast:5
+
+联网搜索最佳实践，讨论一下
+
+
+1. 加载规则就用$name
+
+2. 直接迁移，不保留根目录config/ascii.ts
+
+3. --print-config可以加
+
+没问题的话就开工吧
+
+---
+
+
+
+
+对“边界线”的额外优化，识别跳变，强化边界
