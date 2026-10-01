@@ -13,7 +13,10 @@
     "hook:deploy-articles": "scripts/deploy_articles.sh",
     "stop": "pm2 stop nextsite",
     "log": "pm2 logs nextsite",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:vite": "vite",
+    "build:client": "vite build",
+    "build:render": "vite build --ssr build/render.tsx --outDir .build --emptyOutDir"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -41,6 +44,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.2",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tsx": "^4.23.15"
   }
 }
