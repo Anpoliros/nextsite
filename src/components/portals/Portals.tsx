@@ -18,7 +18,7 @@ export default function Portals({ config, variant, className = "" }: Props) {
       className={`relative overflow-hidden ${className}`}
       style={{ aspectRatio: ui.aspectRatio }}
     >
-      <div className="absolute inset-0" style={{ opacity }}>
+      {opacity > 0 && <div className="absolute inset-0" style={{ opacity }}>
         {bg.type === "image" ? (
           <img
             src={bg.value}
@@ -28,7 +28,7 @@ export default function Portals({ config, variant, className = "" }: Props) {
         ) : (
           <div className="w-full h-full" style={{ backgroundColor: bg.value }} />
         )}
-      </div>
+      </div>}
 
       <div className="relative h-full w-full">
         <PortalGrid config={config} variant={variant} />

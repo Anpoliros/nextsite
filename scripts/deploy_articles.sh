@@ -19,15 +19,10 @@ trap cleanup EXIT
 
 cd "$ROOT_DIR"
 
-# build 会先执行 sync-articles：
-# 1. 更新并强制对齐 articles 子模块
-# 2. 同步 articles/images 到 public/images
-# 3. 运行 scripts/md_pic_remap.py 重写 Markdown 图片路径
+# 显式同步远端文章；普通 dev/build 使用本地内容。
+npm run sync-articles
 npm run build
 
-# 构建成功后再切换线上进程；构建失败时旧进程继续服务。
-if pm2 describe nextsite >/dev/null 2>&1; then
-  pm2 reload nextsite --update-env
-else
-  pm2 start ecosystem.config.js --only nextsite
-fi
+# 应用新配置，首次迁移时将原 Next 进程替换为静态文件服务。
+# 构建失败会提前退出，已有 dist 和线上进程继续服务。
+pm2 startOrRestart ecosystem.static.cjs --only nextsite --update-env

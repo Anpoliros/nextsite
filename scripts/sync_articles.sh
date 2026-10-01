@@ -5,14 +5,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 cd "$ROOT_DIR"
 
-# 强制对齐内容仓库，确保构建只使用远端已提交内容。
+# 内容仓库有本地修改时停止，避免自动部署覆盖作者的文章。
+if [[ -n "$(git -C articles status --porcelain)" ]]; then
+  echo "articles contains local changes; commit or preserve them before syncing" >&2
+  exit 1
+fi
 git -C articles fetch --prune
-git -C articles reset --hard '@{u}'
-git -C articles clean -fd
+git -C articles merge --ff-only '@{u}'
 
-# 将文章图片同步到 Next.js 静态资源目录，再统一 Markdown 引用路径。
-rsync -a --delete articles/images/ public/images/
-python scripts/md_pic_remap.py \
-  --image-dir public/images \
-  --md-dir articles/content \
-  --web
+# 图片引用在构建时只读转换；同步步骤只更新已提交的文章。

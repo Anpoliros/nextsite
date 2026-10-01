@@ -1,5 +1,5 @@
 /** 构建端文章读取：解析 frontmatter、摘要与分类，保留现有内容规则。 */
-import fs from 'fs'
+import { execFileSync } from 'node:child_process'
 import path from 'path'
 import matter from 'gray-matter'
 import { extractMarkdownExcerpt, renderMarkdownDocument } from '../src/lib/markdown'
@@ -41,17 +41,11 @@ export type PostIndex = {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function collectFiles(dir: string): string[] {
-  const results: string[] = []
-  for (const entry of fs.readdirSync(dir)) {
-    const full = path.join(dir, entry)
-    if (fs.statSync(full).isDirectory()) {
-      results.push(...collectFiles(full))
-    } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
-      results.push(full)
-    }
-  }
-  return results
+/** 复用 Python 图片匹配器，只处理内存中的正文，保留原始文件。 */
+export function readContentSources(): Record<string, string> {
+  return JSON.parse(execFileSync(process.env.PYTHON || 'python3', ['scripts/prepare_content.py'], {
+    encoding: 'utf8', maxBuffer: 32 * 1024 * 1024,
+  }))
 }
 
 function dateToString(date: unknown): string {
@@ -79,18 +73,13 @@ function booleanFromFrontmatter(value: unknown): boolean {
 
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
-function scanPosts(): RawPost[] {
-  const contentDir = path.resolve('articles/content')
-  return collectFiles(contentDir)
-    .filter((filePath) => {
-      // exclude files placed directly at content root (e.g. about.md)
-      const rel = path.relative(contentDir, filePath)
-      return rel.includes(path.sep)
-    })
-    .sort()  // stable alphabetical order → stable post_id across builds
-    .map((filePath) => {
-      const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'))
-      return { filePath, content, frontmatter: data }
+function scanPosts(sources: Record<string, string>): RawPost[] {
+  return Object.entries(sources)
+    .filter(([relativePath]) => relativePath.includes('/'))
+    .sort(([a], [b]) => a.localeCompare(b, 'en'))
+    .map(([relativePath, source]) => {
+      const { data, content } = matter(source)
+      return { filePath: path.resolve('articles/content', relativePath), content, frontmatter: data }
     })
 }
 
@@ -121,8 +110,8 @@ function normalizePosts(raw: RawPost[]): PostMeta[] {
 }
 
 /** 每次构建或开发预览创建新索引，避免进程缓存掩盖文章修改。 */
-export function readPostIndex(): PostIndex {
-  const posts = normalizePosts(scanPosts())
+export function readPostIndex(sources = readContentSources()): PostIndex {
+  const posts = normalizePosts(scanPosts(sources))
   return {
     categories: [...new Set(posts.map(post => post.post_category))].sort(),
     tags: [...new Set(posts.flatMap(post => post.post_tag))].sort(),
@@ -133,19 +122,10 @@ export function readPostIndex(): PostIndex {
 /**
  * 读取 content/ 下的任意单文件并渲染（用于 about 等非索引页）
  */
-export async function getSinglePostContent(relativePath: string) {
-  const targetPath = path.resolve('articles/content', relativePath)
-
-  if (!fs.existsSync(targetPath)) {
-    return null
-  }
-
-  const { data, content } = matter(fs.readFileSync(targetPath, 'utf-8'))
+export async function getSinglePostContent(relativePath: string, sources: Record<string, string>) {
+  const source = sources[relativePath]
+  if (source === undefined) return null
+  const { data, content } = matter(source)
   const { html, toc } = await renderMarkdownDocument(content)
-
-  return {
-    meta: { title: String(data.title ?? '') },
-    content: html,
-    toc,
-  }
+  return { meta: { title: String(data.title ?? '') }, content: html, toc }
 }

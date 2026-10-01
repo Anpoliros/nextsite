@@ -1,5 +1,5 @@
 /** 静态路由清单：枚举列表、分页与文章，按需准备正文渲染数据。 */
-import { readPostIndex, getSinglePostContent, type PostMeta } from './content';
+import { readContentSources, readPostIndex, getSinglePostContent, type PostMeta } from './content';
 import { contentConfig } from '../src/config/content';
 import { siteConfig } from '../src/config/site';
 import { renderMarkdownDocument } from '../src/lib/markdown';
@@ -28,7 +28,8 @@ function stableIndex(path: string, length: number) {
 
 // ============================== 路由生成 ==============================
 export function createRoutes(): Route[] {
-  const index = readPostIndex();
+  const sources = readContentSources();
+  const index = readPostIndex(sources);
   const posts = [...index.posts].sort((a, b) => b.post_timestamp - a.post_timestamp);
   for (const post of posts) {
     const slug = post.post_path.split('/').at(-1)!;
@@ -77,7 +78,7 @@ export function createRoutes(): Route[] {
   })).filter(group => group.tags.length).sort((a, b) => a.name.localeCompare(b.name));
   add('/tags/', async () => ({ ...common, path: '/tags/', kind: 'tags', title: 'Tags', groups }));
   add('/about/', async () => {
-    const about = await getSinglePostContent('about.md');
+    const about = await getSinglePostContent('about.md', sources);
     if (!about) throw new Error('缺少 articles/content/about.md');
     return { ...common, path: '/about/', kind: 'about', title: about.meta.title || 'About', html: about.content };
   });

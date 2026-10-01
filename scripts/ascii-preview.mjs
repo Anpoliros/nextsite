@@ -4,13 +4,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
-import { createJiti } from "jiti";
+import { tsImport } from "tsx/esm/api";
 
-const jiti = createJiti(import.meta.url);
-const defaultAsciiConfig = jiti("../lib/ascii/configs/default.ts").default;
-const { renderImageFileToAscii } = jiti("../lib/ascii/image.ts");
+const defaultAsciiConfig = (await tsImport("../src/lib/ascii/configs/default.ts", import.meta.url)).default;
+const { renderImageFileToAscii } = await tsImport("../src/lib/ascii/image.ts", import.meta.url);
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const configsDir = path.resolve(scriptDir, "../lib/ascii/configs");
+const configsDir = path.resolve(scriptDir, "../src/lib/ascii/configs");
 
 const VALUE_FLAGS = new Set([
   "--alpha-empty",
@@ -132,14 +131,14 @@ function readConfigName(args) {
   return name;
 }
 
-function loadNamedConfig(name) {
+async function loadNamedConfig(name) {
   const configPath = path.join(configsDir, `${name}.ts`);
 
   if (!fs.existsSync(configPath)) {
     throw new Error(`Unknown ASCII config "${name}". Available: ${listConfigNames().join(", ")}`);
   }
 
-  const loaded = jiti(configPath);
+  const loaded = await tsImport(configPath, import.meta.url);
 
   return loaded.default ?? loaded;
 }
@@ -209,7 +208,7 @@ function printHelp() {
   console.log(`Usage: npm run ascii:preview -- <image> [options]
 
 Options:
-  --config <name>  Load lib/ascii/configs/<name>.ts
+  --config <name>  Load src/lib/ascii/configs/<name>.ts
   --columns <n>    Output width in terminal characters
   --rows <n>       Output height in terminal rows
   --charset <name> Charset from the resolved config
@@ -243,9 +242,9 @@ Examples:
 `);
 }
 
-function resolveConfig(args) {
+async function resolveConfig(args) {
   const configName = readConfigName(args);
-  const profileConfig = configName ? loadNamedConfig(configName) : {};
+  const profileConfig = configName ? await loadNamedConfig(configName) : {};
   const resolvedConfig = deepMerge(defaultAsciiConfig, profileConfig);
   const backgroundColor = readColorFlag(args, "--background");
   const alphaEmptyChar = readStringFlag(args, "--alpha-empty") ?? resolvedConfig.alpha.emptyChar;
@@ -298,7 +297,7 @@ async function main() {
     return;
   }
 
-  const resolvedConfig = resolveConfig(args);
+  const resolvedConfig = await resolveConfig(args);
 
   if (args.includes("--charsets")) {
     for (const [name, chars] of Object.entries(resolvedConfig.charsets)) {

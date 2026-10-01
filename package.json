@@ -1,12 +1,12 @@
 {
-  "name": "nextsite",
+  "name": "weblog",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "sync-articles": "scripts/sync_articles.sh",
-    "dev": "npm run sync-articles && next dev",
-    "build": "npm run sync-articles && next build",
-    "start": "npm run sync-articles && next start",
+    "dev": "tsx build/dev.ts",
+    "build": "tsc --noEmit && tsx build/generate.ts",
+    "start": "node scripts/static-server.mjs",
     "deploy": "scripts/deploy_articles.sh",
     "ascii:preview": "node scripts/ascii-preview.mjs",
     "hook:articles": "node scripts/articles_webhook.mjs",
@@ -14,10 +14,11 @@
     "stop": "pm2 stop nextsite",
     "log": "pm2 logs nextsite",
     "lint": "eslint",
-    "dev:vite": "vite",
     "build:client": "vite build",
     "build:render": "vite build --ssr build/render.tsx --outDir .build --emptyOutDir",
-    "build:ssg": "tsx build/generate.ts"
+    "build:ssg": "tsx build/generate.ts",
+    "preview": "node scripts/static-server.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
