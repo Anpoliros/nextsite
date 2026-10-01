@@ -1,5 +1,5 @@
 /** 页面数据协议：构建端准备内容，浏览器只接收当前页面的展示数据。 */
-import type { MarkdownRenderResult } from '../../lib/markdown/types';
+import type { MarkdownRenderResult } from '../lib/markdown/types';
 
 export type Article = {
   id: string; title: string; excerpt: string; date: string; category: string; tags: string[];

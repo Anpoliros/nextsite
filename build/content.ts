@@ -2,8 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { contentConfig } from '../config/content'
-import { extractMarkdownExcerpt } from '../lib/markdown'
+import { extractMarkdownExcerpt, renderMarkdownDocument } from '../src/lib/markdown'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -81,7 +80,7 @@ function booleanFromFrontmatter(value: unknown): boolean {
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
 function scanPosts(): RawPost[] {
-  const contentDir = contentConfig.contentDir
+  const contentDir = path.resolve('articles/content')
   return collectFiles(contentDir)
     .filter((filePath) => {
       // exclude files placed directly at content root (e.g. about.md)
@@ -96,7 +95,7 @@ function scanPosts(): RawPost[] {
 }
 
 function normalizePosts(raw: RawPost[]): PostMeta[] {
-  const contentDir = contentConfig.contentDir
+  const contentDir = path.resolve('articles/content')
   return raw.map(({ filePath, content, frontmatter }, index) => {
     const rel = path.relative(contentDir, filePath)
     const category = rel.split(path.sep)[0]
@@ -128,5 +127,25 @@ export function readPostIndex(): PostIndex {
     categories: [...new Set(posts.map(post => post.post_category))].sort(),
     tags: [...new Set(posts.flatMap(post => post.post_tag))].sort(),
     posts,
+  }
+}
+
+/**
+ * 读取 content/ 下的任意单文件并渲染（用于 about 等非索引页）
+ */
+export async function getSinglePostContent(relativePath: string) {
+  const targetPath = path.resolve('articles/content', relativePath)
+
+  if (!fs.existsSync(targetPath)) {
+    return null
+  }
+
+  const { data, content } = matter(fs.readFileSync(targetPath, 'utf-8'))
+  const { html, toc } = await renderMarkdownDocument(content)
+
+  return {
+    meta: { title: String(data.title ?? '') },
+    content: html,
+    toc,
   }
 }

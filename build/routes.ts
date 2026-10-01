@@ -1,8 +1,8 @@
 /** 静态路由清单：枚举列表、分页与文章，按需准备正文渲染数据。 */
-import { readPostIndex, type PostMeta } from './content';
-import { contentConfig } from '../config/content';
-import { siteConfig } from '../config/site';
-import { getSinglePostContent, renderMarkdownDocument } from '../lib/markdown';
+import { readPostIndex, getSinglePostContent, type PostMeta } from './content';
+import { contentConfig } from '../src/config/content';
+import { siteConfig } from '../src/config/site';
+import { renderMarkdownDocument } from '../src/lib/markdown';
 import { paginationPath, tagPath } from '../src/site/paths';
 import type { Article, PageData, PostSummary } from '../src/site/types';
 
@@ -30,6 +30,10 @@ function stableIndex(path: string, length: number) {
 export function createRoutes(): Route[] {
   const index = readPostIndex();
   const posts = [...index.posts].sort((a, b) => b.post_timestamp - a.post_timestamp);
+  for (const post of posts) {
+    const slug = post.post_path.split('/').at(-1)!;
+    post.post_path = `/${encodeURIComponent(post.post_category)}/${encodeURIComponent(slug)}/`;
+  }
   const routes: Route[] = [];
   const seen = new Set<string>();
   const limit = contentConfig.pagination.articlesPerPage;
@@ -54,7 +58,7 @@ export function createRoutes(): Route[] {
   }
   const common = { title: siteConfig.title, description: siteConfig.description };
   listing('/', posts, data => ({ ...common, ...data, kind: 'home',
-    pinnedArticles: posts.filter(post => contentConfig.pinnedArticles.includes(post.post_path.slice(1))).map(article) }));
+    pinnedArticles: posts.filter(post => contentConfig.pinnedArticles.includes(post.post_path.slice(1).replace(/\/$/, ''))).map(article) }));
 
   for (const category of [...new Set([...index.categories, ...Object.keys(contentConfig.categories)])]) {
     const displayInfo = contentConfig.categories[category] || {
@@ -78,9 +82,6 @@ export function createRoutes(): Route[] {
     return { ...common, path: '/about/', kind: 'about', title: about.meta.title || 'About', html: about.content };
   });
   for (const [position, post] of posts.entries()) {
-    // 沿用分类 + 文件名规则，将中文和特殊字符作为完整 URL 片段处理。
-    const slug = post.post_path.split('/').at(-1)!;
-    post.post_path = `/${encodeURIComponent(post.post_category)}/${encodeURIComponent(slug)}/`;
     const others = posts.filter(item => item !== post);
     add(post.post_path, async () => ({ ...common, path: post.post_path, kind: 'article',
       title: post.post_title, description: post.post_excerpt || siteConfig.description,
