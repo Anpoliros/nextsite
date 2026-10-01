@@ -44,6 +44,7 @@ export type PostIndex = {
 /** 复用 Python 图片匹配器，只处理内存中的正文，保留原始文件。 */
 export function readContentSources(): Record<string, string> {
   return JSON.parse(execFileSync(process.env.PYTHON || 'python3', ['scripts/prepare_content.py'], {
+    env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' },
     encoding: 'utf8', maxBuffer: 32 * 1024 * 1024,
   }))
 }

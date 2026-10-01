@@ -37,7 +37,7 @@ content/developer/*
 # testing
 /coverage
 
-# next.js
+# 旧框架产物及新静态构建产物
 /.next/
 /out/
 
@@ -64,3 +64,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python 运行缓存与临时日志
+__pycache__/
+*.pyc
+/nohup.out

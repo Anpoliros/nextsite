@@ -4,7 +4,7 @@
 
 ## 内容同步
 
-`scripts/sync_articles.sh` 是内容同步入口，负责更新 `articles` 仓库、同步静态图片，并调用 `scripts/md_pic_remap.py` 将 Markdown 中的本地图片引用重写为 Web 可访问路径。
+`scripts/sync_articles.sh` 是内容同步入口，检查本地修改后按 upstream 快进更新 `articles` 仓库。构建端通过 `scripts/prepare_content.py` 在内存中准备图片引用。
 
 图片匹配优先使用完整路径和文件名，也支持省略扩展名以及 `-`、`_` 分隔符混用。分隔符归一化后出现多个候选时，脚本会跳过该引用，避免写入错误路径。
 
@@ -52,8 +52,8 @@ npm run hook:articles
 `scripts/deploy_articles.sh` 是 webhook 触发后的实际部署脚本。它会：
 
 1. 使用 `.logs/deploy_articles.lock` 防止并发部署。
-2. 执行 `npm run build`，该命令会先运行 `sync-articles`，包含 articles 子模块更新、图片同步和 Markdown 图片路径重写。
-3. 构建成功后 reload `nextsite` PM2 进程；如果进程不存在，则按 `ecosystem.config.js` 启动。
+2. 显式执行 `npm run sync-articles`，再执行 `npm run build`；构建只读本地内容。
+3. 构建成功后使用 `ecosystem.static.cjs` 启动或重启静态服务，沿用 nextsite 名称。
 
 手动验证：
 
@@ -63,7 +63,7 @@ npm run hook:deploy-articles
 
 ## ASCII 图片预览
 
-`scripts/ascii-preview.mjs` 用于在终端中预览图片转字符画效果。它读取 `config/ascii.ts` 的默认列数、最大行数、字符集、反色和抖动参数，并通过 `sharp` 解码 JPG、PNG、SVG、WebP 等常见图片格式。
+`scripts/ascii-preview.mjs` 用于在终端中预览图片转字符画效果。它读取 `src/lib/ascii/configs/default.ts` 的默认列数、最大行数、字符集、反色和抖动参数，并通过 `sharp` 解码 JPG、PNG、SVG、WebP 等常见图片格式。
 
 常用入口：
 
@@ -83,3 +83,5 @@ npm run ascii:preview -- --charsets
 - 修改自动部署流程时，同步更新 `docs/workflows/build.md`。
 - 修改 webhook 校验规则时，同步检查 Gitea webhook 配置。
 - 修改 articles 默认分支时，同步调整子模块 upstream、`sync-articles` 行为和 `EXPECTED_REF`。
+
+首次部署检测 nextsite 的实际脚本路径；仍指向 Next 时，在构建成功后删除旧进程并按静态配置重新注册，后续发布直接重启。

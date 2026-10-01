@@ -11,11 +11,17 @@ const previous = path.resolve('.build/previous');
 
 // ============================== 构建和输出 ==============================
 await mkdir('.build', { recursive: true });
-await build({ build: { outDir: staging, emptyOutDir: true } });
+await build({ build: { outDir: staging, emptyOutDir: true, copyPublicDir: false } });
 await build({ build: { ssr: 'build/render.tsx', outDir: '.build/render', emptyOutDir: true, manifest: false, rollupOptions: { output: { entryFileNames: 'render.mjs' } } } });
 const modulePath = path.resolve('.build/render/render.mjs');
 const { renderPage } = await import(modulePath) as { renderPage: (data: PageData, template: string) => string };
 const template = await readFile(path.join(staging, 'index.html'), 'utf8');
+// 复制公开资源时排除旧图片缓存和日志，文章图片只来自当前内容仓库。
+const publicRoot = path.resolve('public');
+await cp(publicRoot, staging, {
+  recursive: true,
+  filter: source => !['images', 'temp'].includes(path.relative(publicRoot, source).split(path.sep)[0]) && !source.endsWith('.log'),
+});
 // 直接复制文章图片；构建不会改写原始 Markdown 或更新子模块。
 await cp('articles/images', path.join(staging, 'images'), { recursive: true });
 const routes = createRoutes();

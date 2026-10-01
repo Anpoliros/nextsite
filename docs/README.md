@@ -25,7 +25,7 @@ docs/
 
 ```txt
 docs/
-  app/        # 对应 app/，记录页面、布局、路由和渲染策略
+  app/        # 对应 src/pages/、src/site/ 和 build/routes.ts，记录页面与路由
   components/ # 对应 components/，记录公共组件和关键交互组件
   lib/        # 对应 lib/，记录数据处理、Markdown、内容读取等核心逻辑
   content/    # 对应内容源和静态资源，记录内容模型与资源产物

@@ -4,22 +4,22 @@
 
 ## 模块视角
 
-`components/layout/` 提供所有页面共享的框架能力。页面组件只负责传入正文和可选右侧内容，不直接重复全局 Header、Footer 或网格结构。
+`src/components/layout/` 提供所有页面共享的框架能力。页面组件只负责传入正文和可选右侧内容，不直接重复全局 Header、Footer 或网格结构。
 
 ## 实现视角
 
 关键文件：
 
-- `app/layout.tsx`：根布局，接入字体、主题变量、`ThemeProvider` 和全局容器。
-- `components/layout/Header.tsx`：顶部导航，读取 `siteConfig.logo` 和 `siteConfig.navLinks`。
-- `components/layout/HeaderActions.tsx`：客户端操作区，处理主题切换和占位操作按钮。
-- `components/layout/PageShell.tsx`：页面内容网格，左侧主内容、右侧可选 aside。
-- `components/layout/Footer.tsx`：页脚文本。
-- `components/theme-provider.tsx`：封装 `next-themes`。
+- `src/site/Page.tsx`：根布局，接入`ThemeProvider` 和全局容器。
+- `src/components/layout/Header.tsx`：顶部导航，读取 `siteConfig.logo` 和 `siteConfig.navLinks`。
+- `src/components/layout/HeaderActions.tsx`：客户端操作区，处理主题切换和占位操作按钮。
+- `src/components/layout/PageShell.tsx`：页面内容网格，左侧主内容、右侧可选 aside。
+- `src/components/layout/Footer.tsx`：页脚文本。
+- `src/components/theme-provider.tsx`：提供 React 主题上下文、localStorage 持久化和系统主题跟随。
 
 ## 数据模型
 
-布局主要由 `config/layout.ts`、`config/site.ts` 控制：
+布局主要由 `src/config/layout.ts`、`src/config/site.ts` 控制：
 
 - `layoutConfig.gridTemplateColumns`：`PageShell` 的桌面端左右列比例。
 - `layoutConfig.headerContainer`：顶部栏容器宽度和内边距。
@@ -28,17 +28,17 @@
 - `uiConfig.fontSizes`：Header、Footer 等全局布局文字尺寸。
 - `siteConfig.navLinks`：顶部导航链接。
 
-## Server/Client 边界
+## 构建与浏览器边界
 
-`Header.tsx` 和 `PageShell.tsx` 保持 Server Component。`HeaderActions.tsx` 使用 `"use client"`，因为它依赖 `useTheme`、`useState` 和 `useEffect`。
+所有页面都是普通 React 组件，构建时输出 HTML，浏览器使用相同组件树接管。访问 window、localStorage 和媒体查询的逻辑放在 useEffect 或事件处理里。首次浏览器渲染保持与构建时一致；主题提前由 HTML head 中的初始化脚本应用，正文交互挂载后跟随主题上下文。
 
-不要为了一个小交互把整个布局提升为 Client Component。优先把浏览器状态封装到更小的组件中。
+主题颜色由 `build/render.tsx` 注入，布局使用现有 Arial 和浏览器默认等宽字体。
 
 ## 修改指南
 
-- 修改全局容器尺寸时，优先改 `config/layout.ts`。
+- 修改全局容器尺寸时，优先改 `src/config/layout.ts`。
 - 新增页面右栏内容时，通过 `PageShell` 的 `right` prop 注入。
-- 修改主题颜色时，优先改 `config/layout.ts` 的 `uiConfig.themeColors`，再检查 `app/globals.css` 中是否有固定颜色覆盖。
+- 修改主题颜色时，优先改 `src/config/layout.ts` 的 `uiConfig.themeColors`，再检查 `src/styles/globals.css` 中是否有固定颜色覆盖。
 - 新增 Header 操作按钮时，如果需要事件处理，放在 `HeaderActions.tsx`。
 
 ## 验证方式

@@ -1,18 +1,24 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+/** 通用 TypeScript / React 检查，覆盖页面、构建代码和 Node 脚本。 */
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import hooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
-
-export default eslintConfig;
+export default tseslint.config(
+  { ignores: ['dist/**', '.build/**', '.next/**', 'articles/**', 'public/**'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    rules: { '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }] },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': hooks },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
+  { files: ['scripts/*.mjs'], rules: { '@typescript-eslint/no-require-imports': 'off' } },
+);

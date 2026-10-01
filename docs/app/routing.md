@@ -1,54 +1,29 @@
 # Routing
 
-本文档记录站点路由、页面数据来源和动态路由生成规则。
-
-## 模块视角
-
-路由结构直接反映内容站点的访问模型：文章按分类目录组织，标签从文章 frontmatter 聚合，详情页由分类和 slug 唯一定位。
+`build/routes.ts` 枚举生产静态页面；`src/site/paths.ts` 为生成器和界面提供一致的 URL 规则。
 
 ## 路由表
 
-| Route | File | Data Source | Notes |
-| --- | --- | --- | --- |
-| `/` | `app/page.tsx` | `getAllPosts()`、`contentConfig`、`portalsConfig` | 首页时间线、置顶文章、Portals |
-| `/about` | `app/about/page.tsx` | `getSinglePostContent()` | 单页内容，来自内容目录根文件 |
-| `/tags` | `app/tags/page.tsx` | `getAllPosts()` | 按分类聚合标签 |
-| `/tags/[tag]` | `app/tags/[tag]/page.tsx` | `getAllPosts()` | 标签文章列表，tag 需要 `decodeURIComponent` |
-| `/[category]` | `app/[category]/page.tsx` | `getAllPosts()`、`contentConfig.categories` | 分类文章列表 |
-| `/[category]/[slug]` | `app/[category]/[slug]/page.tsx` | `getPostBySlug()`、`renderMarkdownDocument()` | 文章详情页，可按 `showToc` 展示目录 |
+| URL | 页面 |
+| --- | --- |
+| `/`、`/page/<n>/` | 首页时间线 |
+| `/<category>/`、`/<category>/page/<n>/` | 分类列表 |
+| `/tags/` | 标签总览 |
+| `/tags/<tag>/`、`/tags/<tag>/page/<n>/` | 标签列表 |
+| `/<category>/<slug>/` | 文章 |
+| `/about/` | 关于页 |
+| 未生成路径 | 404 |
 
-## 静态参数
+## 实现视角
 
-以下页面通过 `generateStaticParams()` 枚举动态路由：
+分类沿用文章目录第一层；slug 沿用文件名。URL 片段编码，输出目录解码。路由生成器检查路径重复，SSG 输出检查目录越界。标签链接必须使用 `tagPath`，分页必须使用 `paginationPath`。不提供旧查询参数分页兼容。
 
-- `app/[category]/page.tsx`：从 `getAllPosts().categories` 生成分类。
-- `app/[category]/[slug]/page.tsx`：从 `getAllPosts().posts` 生成分类和 slug。
-- `app/tags/[tag]/page.tsx`：从 `getAllPosts().tags` 生成标签。
-
-如果新增可枚举的动态页面，应沿用这个模式。
-
-## URL 规则
-
-文章 URL 由 `lib/posts/getposts.ts` 生成：
-
-```txt
-articles/content/<category>/<slug>.md
-  -> /<category>/<slug>
-```
-
-分类来自内容目录的第一层目录名，slug 来自 Markdown 文件名。放在 `articles/content` 根目录下的 Markdown 不进入文章索引，适合 `about.md` 这类单页内容。
-
-文章详情页从 `getPostBySlug()` 取得原始 Markdown，再在页面层调用 `renderMarkdownDocument()` 得到 HTML 和 TOC。是否展示目录由 `PostMeta.post_show_toc` 决定。
+每个列表至少生成第一页。`/404/` 对应产物 `404.html`，静态服务对未知路径返回 404。生产服务对存在的页面目录补齐尾部斜线。
 
 ## 修改指南
 
-- 修改 URL 结构时，优先从 `PostMeta.post_path` 入手，并同步更新所有使用 `article.id` 或 `post_path` 的组件。
-- 修改分类展示信息时，改 `config/content.ts` 的 `categories`，不要在页面里硬编码分类文案。
-- 修改标签路由时，注意 URL 编码和 `decodeURIComponent` 的对应关系。
-- 修改动态路由参数类型时，保留 Next.js 16 的 `params: Promise<...>` 和 `searchParams: Promise<...>` 写法。
+新增路由同步更新 PageData 和页面组合入口。重名文章导致构建失败，需要调整内容文件名。
 
 ## 验证方式
 
-- `npm run build`
-- 检查分类页不存在时是否进入 `notFound()`。
-- 检查中文或特殊字符标签能从 `/tags` 正确跳转到 `/tags/[tag]`。
+`npm run build` 后运行 `npm test`，点击分类、标签、分页和文章导航，刷新任意深层页面。

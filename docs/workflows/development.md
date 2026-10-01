@@ -1,66 +1,18 @@
-# Development Workflow
+# Development
 
-本文档记录本地开发、常用命令和修改前需要关注的项目约束。
+开发环境使用 Vite 处理资源，按请求渲染与生产相同的 React 页面。
 
-## 触发场景
+## 执行步骤
 
-开始开发、调试文章内容、修改页面组件、调整 Markdown 渲染或更新构建配置时，应先阅读本文档。
+1. 安装 Node.js 22.12+ 和 Python 3，执行 `npm install`。
+2. 在 articles 子模块准备内容，执行 `npm run dev`。
+3. 浏览 http://127.0.0.1:5173；可通过 PORT 更改开发端口。
+4. 执行 `npm run lint`、`npm run build`、`npm test`。
 
-## 技术栈
+## 实现视角
 
-- Next.js `16.2.3`
-- React `19.2.4`
-- Tailwind CSS `4`
-- TypeScript `5`
-- ESLint `9`
-- Markdown pipeline：`unified`、`remark-*`、`rehype-*`、`shiki`
-
-Next.js 相关实现需要以 `node_modules/next/dist/docs/` 中的本地文档为准。
-
-## 常用命令
-
-| Command | Meaning |
-| --- | --- |
-| `npm run dev` | 同步文章和图片后启动 Next dev server |
-| `npm run build` | 同步文章和图片后执行生产构建 |
-| `npm run start` | 同步文章和图片后启动生产服务 |
-| `npm run lint` | 运行 ESLint |
-| `npm run sync-articles` | 强制对齐 articles 子模块 upstream、同步图片、重写 Markdown 图片路径 |
-| `npm run hook:articles` | 前台启动 articles webhook daemon，用于本地调试自动部署触发 |
-| `npm run hook:deploy-articles` | 手动执行 articles 自动部署脚本 |
-| `npm run deploy` | 构建后通过 PM2 启动 |
-| `npm run stop` | 停止 PM2 进程 |
-| `npm run log` | 查看 PM2 日志 |
-
-## 开发前检查
-
-- 修改 Next.js 路由、页面参数、Server/Client Component 边界前，先读相关 Next 本地文档。
-- 修改文章或图片流程前，先确认 `articles/` 子模块状态；`sync-articles` 会丢弃子模块内的本地临时改动。
-- 修改 Markdown 渲染前，先准备包含代码块和表格的文章用于人工检查。
-- 修改公共组件接口时，同步检查引用页面和 `docs/MAP.md`。
+`build/dev.ts` 使用 Node HTTP 和 Vite 中间件，加载 `build/routes.ts`、`render.tsx`。文章、图片和源码变化使索引缓存失效，Vite 更新客户端代码或刷新页面。正文增强样式来自组件 CSS module 和 `src/styles/globals.css`。
 
 ## 验证方式
 
-最小验证：
-
-```sh
-npm run lint
-```
-
-涉及路由、内容、构建或部署时：
-
-```sh
-npm run build
-```
-
-涉及内容同步时：
-
-```sh
-npm run sync-articles
-```
-
-## 常见风险
-
-- `npm run dev`、`build`、`start` 都会先运行 `sync-articles`，可能修改 `articles/content` 中的图片引用。
-- `getAllPosts()` 会写 `.logs/postindex_*.json`，这是索引排查产物。
-- 页面路由参数使用 Next.js 16 的 Promise 写法，修改时不要回退到旧式同步参数。
+检查新文章预览、源码热更新和深层页面刷新；检查代码复制、表格操作、主题持久化和 ASCII。

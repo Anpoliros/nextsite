@@ -1,6 +1,6 @@
 # Shared Components
 
-`components/shared/` 放置跨页面复用的展示和增强组件。
+`src/components/shared/` 放置跨页面复用的展示和增强组件。
 
 ## 模块视角
 
@@ -10,12 +10,12 @@
 
 关键文件：
 
-- `components/shared/ArticleList.tsx`：文章列表卡片，接收页面层映射后的 `Article[]`。
-- `components/shared/ArticleBody.tsx`：Markdown HTML 容器，挂载 `MarkdownEnhancer` 并承载局部样式。
-- `components/shared/ArticleBody.module.css`：notice 的局部样式。代码块和表格样式仍由 `app/globals.css` 承载。
-- `components/shared/ArticleToc.tsx`：文章目录组件，接收 `MarkdownTocItem[]` 并渲染可折叠目录。
-- `components/shared/Pagination.tsx`：基于 `basePath` 和 `page` query 的分页链接。
-- `components/shared/MarkdownEnhancer.tsx`：客户端事件委托，为 Markdown 生成的代码块和表格绑定复制/折行行为。
+- `src/components/shared/ArticleList.tsx`：文章列表卡片，接收页面层映射后的 `Article[]`。
+- `src/components/shared/ArticleBody.tsx`：Markdown HTML 容器，挂载 `MarkdownEnhancer` 并承载局部样式。
+- `src/components/shared/ArticleBody.module.css`：notice 的局部样式。代码块和表格样式仍由 `src/styles/globals.css` 承载。
+- `src/components/shared/ArticleToc.tsx`：文章目录组件，接收 `MarkdownTocItem[]` 并渲染可折叠目录。
+- `src/components/shared/Pagination.tsx`：基于 `basePath` 和 `page` query 的分页链接。
+- `src/components/shared/MarkdownEnhancer.tsx`：客户端事件委托，为 Markdown 生成的代码块和表格绑定复制/折行行为。
 
 ## 数据模型
 
@@ -48,17 +48,17 @@
 
 | Prop | Meaning |
 | --- | --- |
-| `items` | `MarkdownTocItem[]`，由 `lib/markdown` 在正文渲染时生成 |
+| `items` | `MarkdownTocItem[]`，由 `src/lib/markdown` 在正文渲染时生成 |
 | `defaultOpen` | 是否默认展开目录，默认为 `true` |
 
 ## 修改指南
 
 - 修改 `Article` 字段时，同步检查首页、分类页和标签页的映射逻辑。
-- 修改 `ArticleList` 标签展示上限时，优先调整 `config/layout.ts` 中的 `uiConfig.articleList.maxTags`。
-- 修改分页 URL 规则时，同步检查 `app/page.tsx`、`app/[category]/page.tsx` 和 `app/tags/[tag]/page.tsx`。
-- 修改 `MarkdownEnhancer` 的选择器时，同步检查 `lib/markdown/codeblock.ts`、`lib/markdown/table.ts` 和 `app/globals.css`。
+- 修改 `ArticleList` 标签展示上限时，优先调整 `src/config/layout.ts` 中的 `uiConfig.articleList.maxTags`。
+- 修改静态分页 URL 规则时，同步检查 `src/pages/HomePage.tsx`、`src/pages/CategoryPage.tsx` 和 `src/pages/TagPage.tsx`。
+- 修改 `MarkdownEnhancer` 的选择器时，同步检查 `src/lib/markdown/codeblock.ts`、`src/lib/markdown/table.ts` 和 `src/styles/globals.css`。
 - 修改 notice 生成 HTML 的 className 时，同步更新 `ArticleBody.module.css`。
-- 修改 TOC 展示时，不要在组件内解析 DOM；目录数据应来自 `lib/markdown`。
+- 修改 TOC 展示时，不要在组件内解析 DOM；目录数据应来自 `src/lib/markdown`。
 - 不要在 `ArticleList` 内直接读取文章数据；它应保持展示组件职责。
 
 ## 验证方式
@@ -73,3 +73,5 @@
 - `docs/app/routing.md`
 - `docs/lib/posts.md`
 - `docs/lib/markdown.md`
+
+分页使用 `src/site/paths.ts` 的 paginationPath，输出目录路径，预取配置已移除。

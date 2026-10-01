@@ -6,14 +6,24 @@ import { createServer as createViteServer } from 'vite';
 import { serveFile } from '../scripts/static-server.mjs';
 import type { Route } from './routes';
 
-const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'custom' });
+const server = createServer();
+const vite = await createViteServer({
+  server: { middlewareMode: true, hmr: { server } }, appType: 'custom',
+});
 vite.watcher.add(path.resolve('articles/content'));
 vite.watcher.add(path.resolve('articles/images'));
 let cached: Route[] | undefined;
 let previousFactory: unknown;
-vite.watcher.on('all', () => { cached = undefined; });
+vite.watcher.on('all', (_event, filename) => {
+  cached = undefined;
+  const relative = path.relative(process.cwd(), filename).replaceAll(path.sep, '/');
+  // 内容与构建模块不在客户端依赖图中，需要主动刷新预生成的数据。
+  if (['articles/content/', 'articles/images/', 'build/', 'src/config/'].some(prefix => relative.startsWith(prefix))) {
+    vite.ws.send({ type: 'full-reload' });
+  }
+});
 
-const server = createServer(async (req, res) => {
+server.on('request', async (req, res) => {
   try {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
     if (pathname.startsWith('/images/') && await serveFile(req, res, 'articles/images', pathname.slice(7))) return;

@@ -13,18 +13,14 @@
     "hook:deploy-articles": "scripts/deploy_articles.sh",
     "stop": "pm2 stop nextsite",
     "log": "pm2 logs nextsite",
-    "lint": "eslint",
-    "build:client": "vite build",
-    "build:render": "vite build --ssr build/render.tsx --outDir .build --emptyOutDir",
-    "build:ssg": "tsx build/generate.ts",
+    "lint": "eslint src build scripts/*.mjs tests/*.mjs",
     "preview": "node scripts/static-server.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/static-site.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.8.0",
-    "next": "16.2.3",
-    "next-themes": "^0.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "rehype-pretty-code": "^0.14.3",
@@ -44,12 +40,15 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.3.2",
     "@vitejs/plugin-react": "^6.1.1",
-    "tsx": "^4.23.15"
+    "tsx": "^4.23.15",
+    "@eslint/js": "^9.39.4",
+    "typescript-eslint": "^8.71.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "globals": "^17.5.0"
   },
   "type": "module"
 }

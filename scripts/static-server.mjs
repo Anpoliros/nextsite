@@ -68,6 +68,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
     }
   });
   server.listen(Number(process.env.PORT || 12121), process.env.HOST || '127.0.0.1', () => {
-    console.log(`静态博客：http://${process.env.HOST || '127.0.0.1'}:${process.env.PORT || 12121}`);
+    console.log(`静态博客：http://${process.env.HOST || '127.0.0.1'}:${server.address().port}`);
   });
 }

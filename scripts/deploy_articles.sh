@@ -23,6 +23,18 @@ cd "$ROOT_DIR"
 npm run sync-articles
 npm run build
 
-# 应用新配置，首次迁移时将原 Next 进程替换为静态文件服务。
-# 构建失败会提前退出，已有 dist 和线上进程继续服务。
+# PM2 重启会保留已有进程的脚本路径，首次迁移需要重新注册。
+# 只输出目标进程的脚本路径，不将进程环境写入日志。
+CURRENT_SCRIPT="$(pm2 jlist | node --input-type=module -e '
+  let input = "";
+  process.stdin.setEncoding("utf8");
+  for await (const chunk of process.stdin) input += chunk;
+  const app = JSON.parse(input).find(item => item.name === "nextsite");
+  process.stdout.write(app?.pm2_env?.pm_exec_path || "");
+')"
+if [[ -n "$CURRENT_SCRIPT" && "$CURRENT_SCRIPT" != "$ROOT_DIR/scripts/static-server.mjs" ]]; then
+  pm2 delete nextsite
+fi
+
+# 构建失败会提前退出；常规更新继续复用静态服务的配置。
 pm2 startOrRestart ecosystem.static.cjs --only nextsite --update-env

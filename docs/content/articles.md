@@ -78,23 +78,18 @@ title: 示例
 
 ## 图片路径
 
-`npm run sync-articles` 会执行两件与图片相关的操作：
+构建在内存中将图片引用映射为 `/images/<path>`，将 `articles/images/` 复制到产物的 images 目录。开发预览直接提供原图片，原始 Markdown 保留。图片匹配规则复用 `scripts/md_pic_remap.py`，只读入口是 `scripts/prepare_content.py`。
 
-- 强制对齐 `articles/` 子模块到当前分支的 upstream，并清理本地临时改动。
-- 把 `articles/images/` 同步到 `public/images/`。
-- 使用 `scripts/md_pic_remap.py --web` 重写 Markdown 中的本地图片引用。
-
-Web 模式下图片引用会输出为 `/images/<path>`，对应 Next.js 的 `public/images/` 静态资源路径。
+显式 `npm run sync-articles` 只更新无本地修改的内容仓库。
 
 ## 修改指南
 
-- 新增分类目录后，如果需要分类页展示名、描述或横幅，更新 `config/content.ts` 的 `categories`。
-- 新增 frontmatter 字段后，如果页面要使用它，更新 `lib/posts/getposts.ts` 和 `docs/lib/posts.md`。
-- 新增正文指令后，同步更新 `lib/markdown/notices.ts`、`docs/lib/markdown.md` 和本文档。
+- 新增分类目录后，如果需要分类页展示名、描述或横幅，更新 `src/config/content.ts` 的 `categories`。
+- 新增 frontmatter 字段后，如果页面要使用它，更新 `build/content.ts` 和 `docs/lib/posts.md`。
+- 新增正文指令后，同步更新 `src/lib/markdown/notices.ts`、`docs/lib/markdown.md` 和本文档。
 - 修改图片目录或 URL 规则时，同时检查 `package.json` 的 `sync-articles`、`scripts/md_pic_remap.py` 和本文档。
 
 ## 验证方式
 
-- 运行 `npm run sync-articles`。
-- 检查 Markdown 图片引用是否变为 `/images/...`。
+- 构建前后检查 articles 状态一致，产物中的图片引用指向 `/images/...`。
 - 运行 `npm run build`，确认文章列表、分类页和详情页均可生成。
