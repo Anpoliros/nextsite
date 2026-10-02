@@ -37,4 +37,4 @@ if [[ -n "$CURRENT_SCRIPT" && "$CURRENT_SCRIPT" != "$ROOT_DIR/scripts/static-ser
 fi
 
 # 构建失败会提前退出；常规更新继续复用静态服务的配置。
-pm2 startOrRestart ecosystem.static.cjs --only nextsite --update-env
+pm2 startOrRestart ecosystem.config.cjs --only nextsite --update-env

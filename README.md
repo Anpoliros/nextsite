@@ -22,7 +22,7 @@ npm run sync-articles # 显式更新子模块；存在本地修改时退出
 npm run deploy        # 同步、构建，再以新 PM2 配置启动或重启静态服务
 ```
 
-`PORT`、`HOST`、`SITE_DIR` 可配置静态服务的端口、地址和文件目录。默认保持 12121 端口及 PM2 名称 nextsite。部署使用 `ecosystem.static.cjs`；旧 `ecosystem.config.js` 保留了迁移前的未提交修改，不再作为启动入口。文章 webhook 使用新配置中的 nextsite-articles-hook。
+`PORT`、`HOST`、`SITE_DIR` 可配置静态服务的端口、地址和文件目录。默认保持 12121 端口及 PM2 名称 nextsite。部署使用 `ecosystem.config.cjs`；旧 `ecosystem.config.js` 保留了迁移前的未提交修改，不再作为启动入口。文章 webhook 使用新配置中的 nextsite-articles-hook。
 
 ## 目录
 

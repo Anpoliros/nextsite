@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createServer as createViteServer } from 'vite';
-import { serveFile } from '../scripts/static-server.mjs';
+import { serveFile } from '../scripts/static-files.mjs';
 import type { Route } from './routes';
 
 const server = createServer();

@@ -17,9 +17,9 @@
 
 `npm start` 启动 `scripts/static-server.mjs`，默认 127.0.0.1:12121。可配置 HOST、PORT、SITE_DIR；同一产物也可交由 Nginx 等静态服务部署。
 
-`npm run deploy` 使用目录锁，先显式同步 articles，再构建，最后调用 `pm2 startOrRestart ecosystem.static.cjs --only nextsite --update-env`。新配置保留 nextsite 名称和端口，替换原 Next 进程。旧 ecosystem.config.js 保留原有未提交修改，停用。
+`npm run deploy` 使用目录锁，先显式同步 articles，再构建，最后调用 `pm2 startOrRestart ecosystem.config.cjs --only nextsite --update-env`。新配置保留 nextsite 名称和端口，替换原 Next 进程。旧 ecosystem.config.js 保留原有未提交修改，停用。
 
-Webhook 仍由 scripts/articles_webhook.mjs 接收 Gitea push 并触发同一部署脚本，可用 `pm2 start ecosystem.static.cjs --only nextsite-articles-hook` 启动。
+Webhook 仍由 scripts/articles_webhook.mjs 接收 Gitea push 并触发同一部署脚本，可用 `pm2 start ecosystem.config.cjs --only nextsite-articles-hook` 启动。
 
 ## HTTP 行为
 
@@ -30,3 +30,5 @@ Webhook 仍由 scripts/articles_webhook.mjs 接收 Gitea push 并触发同一部
 `npm run lint`、`npm run build`、`npm test`；启动后检查首页、分类、标签、文章、图片和未知路径。线上反向代理仍连接 12121 端口。
 
 首次部署检测 nextsite 的实际脚本路径；仍指向 Next 时，在构建成功后删除旧进程并按静态配置重新注册，后续发布直接重启。
+
+`scripts/static-files.mjs` 提供开发和生产共用的文件响应工具；static-server.mjs 是独立入口，由 Node 或 PM2 加载即启动服务。PM2 配置使用 ecosystem.config.cjs 文件名及 fork 模式。

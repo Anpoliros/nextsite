@@ -53,7 +53,7 @@ npm run hook:articles
 
 1. 使用 `.logs/deploy_articles.lock` 防止并发部署。
 2. 显式执行 `npm run sync-articles`，再执行 `npm run build`；构建只读本地内容。
-3. 构建成功后使用 `ecosystem.static.cjs` 启动或重启静态服务，沿用 nextsite 名称。
+3. 构建成功后使用 `ecosystem.config.cjs` 启动或重启静态服务，沿用 nextsite 名称。
 
 手动验证：
 

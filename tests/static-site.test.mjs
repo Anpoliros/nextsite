@@ -11,7 +11,8 @@ const routeSet = new Set(routes);
 let server;
 let base;
 before(async () => {
-  server = spawn(process.execPath, ['scripts/static-server.mjs'], {
+  // 模拟 PM2 的模块加载方式，确保入口不依赖 process.argv[1]。
+  server = spawn(process.execPath, ['--input-type=module', '-e', "await import('./scripts/static-server.mjs')"], {
     env: { ...process.env, PORT: '0', HOST: '127.0.0.1' }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   await new Promise((resolve, reject) => {

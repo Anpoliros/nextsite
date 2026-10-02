@@ -43,7 +43,7 @@
 | `postcss.config.*`        | `docs/workflows/styling.md`                      | 修改 Tailwind CSS、PostCSS 或样式编译流程时          |
 | `tsconfig.json`           | `docs/workflows/development.md`                  | 修改 TypeScript 配置、路径别名或编译约束时           |
 | `eslint.config.*`         | `docs/workflows/development.md`                  | 修改 lint 规则、代码质量约束或检查流程时             |
-| `ecosystem.static.cjs`, `scripts/static-server.mjs`     | `docs/workflows/build.md`                        | 修改 PM2 部署、进程名、启动参数或日志策略时          |
+| `ecosystem.config.cjs`, `scripts/static-server.mjs`     | `docs/workflows/build.md`                        | 修改 PM2 部署、进程名、启动参数或日志策略时          |
 
 ## 建议新增文档
 
@@ -73,3 +73,5 @@ docs/decisions/0001-docs-structure.md
 - `build/dev.ts`：开发预览，见 `docs/workflows/development.md`。
 - `scripts/prepare_content.py`：只读内容处理，见 `docs/workflows/content-sync.md`。
 - `tests/static-site.test.mjs`：产物和 HTTP 集成验证，见 `docs/workflows/build.md`。
+
+`scripts/static-files.mjs` 提供开发和生产共用的文件响应工具；static-server.mjs 是独立入口，由 Node 或 PM2 加载即启动服务。PM2 配置使用 ecosystem.config.cjs 文件名及 fork 模式。
