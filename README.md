@@ -4,7 +4,7 @@ React + TypeScript + Vite 博客。构建时将 Markdown 转成完整 HTML，生
 
 ## 开发与构建
 
-需要 Node.js 22.12+、Python 3；部署脚本还需要 Git、PM2。
+需要 Node.js 22.12+、Python 3；部署脚本还需要 Git、Git LFS、PM2。
 
 ```sh
 npm install
@@ -15,10 +15,10 @@ npm start            # http://127.0.0.1:12121
 npm test             # 检查已生成页面及静态 HTTP 行为
 ```
 
-`dev`、`build`、`start` 使用本地内容，不拉取或改写 articles。图片匹配复用现有 Python 工具，只转换内存中的内容。文章变化后需重新 build，开发预览会自动刷新。
+`dev`、普通 `build`、`start` 使用本地内容，不拉取或改写 articles。生产部署读取 `.build/articles` 中远端提交的独立 worktree，保留作者工作区。图片匹配复用现有 Python 工具，只转换内存中的内容。文章变化后需重新 build，开发预览会自动刷新。
 
 ```sh
-npm run sync-articles # 显式更新子模块；存在本地修改时退出
+npm run sync-articles # 准备远端提交的独立生产检出目录
 npm run deploy        # 同步、构建，再以新 PM2 配置启动或重启静态服务
 ```
 

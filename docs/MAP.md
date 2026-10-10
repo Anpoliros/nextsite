@@ -75,3 +75,5 @@ docs/decisions/0001-docs-structure.md
 - `tests/static-site.test.mjs`：产物和 HTTP 集成验证，见 `docs/workflows/build.md`。
 
 `scripts/static-files.mjs` 提供开发和生产共用的文件响应工具；static-server.mjs 是独立入口，由 Node 或 PM2 加载即启动服务。PM2 配置使用 ecosystem.config.cjs 文件名及 fork 模式。
+
+- `tests/content-sync.test.mjs`：生产 worktree 同步与本地修改保护，见 `docs/workflows/content-sync.md`。

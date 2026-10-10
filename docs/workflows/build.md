@@ -17,7 +17,7 @@
 
 `npm start` 启动 `scripts/static-server.mjs`，默认 127.0.0.1:12121。可配置 HOST、PORT、SITE_DIR；同一产物也可交由 Nginx 等静态服务部署。
 
-`npm run deploy` 使用目录锁，先显式同步 articles，再构建，最后调用 `pm2 startOrRestart ecosystem.config.cjs --only nextsite --update-env`。新配置保留 nextsite 名称和端口，替换原 Next 进程。旧 ecosystem.config.js 保留原有未提交修改，停用。
+`npm run deploy` 使用目录锁，先准备 `.build/articles` 生产 worktree，再用 `ARTICLES_DIR` 指向它构建，最后调用 `pm2 startOrRestart ecosystem.config.cjs --only nextsite --update-env`。新配置保留 nextsite 名称和端口，替换原 Next 进程。旧 ecosystem.config.js 保留原有未提交修改，停用。
 
 Webhook 仍由 scripts/articles_webhook.mjs 接收 Gitea push 并触发同一部署脚本，可用 `pm2 start ecosystem.config.cjs --only nextsite-articles-hook` 启动。
 

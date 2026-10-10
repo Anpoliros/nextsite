@@ -80,7 +80,7 @@ title: 示例
 
 构建在内存中将图片引用映射为 `/images/<path>`，将 `articles/images/` 复制到产物的 images 目录。开发预览直接提供原图片，原始 Markdown 保留。图片匹配规则复用 `scripts/md_pic_remap.py`，只读入口是 `scripts/prepare_content.py`。
 
-显式 `npm run sync-articles` 只更新无本地修改的内容仓库。
+显式 `npm run sync-articles` 在 `.build/articles` 准备远端提交的独立生产 worktree，原文章工作区不变。
 
 ## 修改指南
 

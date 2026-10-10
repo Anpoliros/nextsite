@@ -1,8 +1,12 @@
 /** 构建端文章读取：解析 frontmatter、摘要与分类，保留现有内容规则。 */
 import { execFileSync } from 'node:child_process'
-import path from 'path'
+import path from 'node:path'
+
 import matter from 'gray-matter'
 import { extractMarkdownExcerpt, renderMarkdownDocument } from '../src/lib/markdown'
+
+// 本地开发默认读取作者工作区；生产由部署脚本指定干净检出目录。
+const contentDirectory = path.resolve(process.env.ARTICLES_DIR || 'articles', 'content')
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -80,12 +84,12 @@ function scanPosts(sources: Record<string, string>): RawPost[] {
     .sort(([a], [b]) => a.localeCompare(b, 'en'))
     .map(([relativePath, source]) => {
       const { data, content } = matter(source)
-      return { filePath: path.resolve('articles/content', relativePath), content, frontmatter: data }
+      return { filePath: path.resolve(contentDirectory, relativePath), content, frontmatter: data }
     })
 }
 
 function normalizePosts(raw: RawPost[]): PostMeta[] {
-  const contentDir = path.resolve('articles/content')
+  const contentDir = contentDirectory
   return raw.map(({ filePath, content, frontmatter }, index) => {
     const rel = path.relative(contentDir, filePath)
     const category = rel.split(path.sep)[0]

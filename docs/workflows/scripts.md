@@ -4,7 +4,7 @@
 
 ## 内容同步
 
-`scripts/sync_articles.sh` 是内容同步入口，检查本地修改后按 upstream 快进更新 `articles` 仓库。构建端通过 `scripts/prepare_content.py` 在内存中准备图片引用。
+`scripts/sync_articles.sh` 是内容同步入口，fetch 后将 upstream 提交检出到独立的 `.build/articles` worktree，保留作者的本地修改。构建端通过 `scripts/prepare_content.py` 在内存中准备图片引用。
 
 图片匹配优先使用完整路径和文件名，也支持省略扩展名以及 `-`、`_` 分隔符混用。分隔符归一化后出现多个候选时，脚本会跳过该引用，避免写入错误路径。
 
@@ -52,7 +52,7 @@ npm run hook:articles
 `scripts/deploy_articles.sh` 是 webhook 触发后的实际部署脚本。它会：
 
 1. 使用 `.logs/deploy_articles.lock` 防止并发部署。
-2. 显式执行 `npm run sync-articles`，再执行 `npm run build`；构建只读本地内容。
+2. 显式执行 `npm run sync-articles`，再执行 `npm run build`；生产构建读取独立 worktree 中远端已提交的内容。
 3. 构建成功后使用 `ecosystem.config.cjs` 启动或重启静态服务，沿用 nextsite 名称。
 
 手动验证：

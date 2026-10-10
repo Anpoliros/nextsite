@@ -21,7 +21,7 @@ cd "$ROOT_DIR"
 
 # 显式同步远端文章；普通 dev/build 使用本地内容。
 npm run sync-articles
-npm run build
+ARTICLES_DIR="$ROOT_DIR/.build/articles" npm run build
 
 # PM2 重启会保留已有进程的脚本路径，首次迁移需要重新注册。
 # 只输出目标进程的脚本路径，不将进程环境写入日志。

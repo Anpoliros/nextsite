@@ -23,7 +23,7 @@ await cp(publicRoot, staging, {
   filter: source => !['images', 'temp'].includes(path.relative(publicRoot, source).split(path.sep)[0]) && !source.endsWith('.log'),
 });
 // 直接复制文章图片；构建不会改写原始 Markdown 或更新子模块。
-await cp('articles/images', path.join(staging, 'images'), { recursive: true });
+await cp(path.resolve(process.env.ARTICLES_DIR || 'articles', 'images'), path.join(staging, 'images'), { recursive: true });
 const routes = createRoutes();
 for (const route of routes) {
   const decoded = decodeURIComponent(route.path);

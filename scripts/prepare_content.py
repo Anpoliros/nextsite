@@ -3,14 +3,16 @@
 import contextlib
 import io
 import json
+import os
 from pathlib import Path
 from md_pic_remap import MarkdownImageProcessor
 
 # ============================== 读取和转换 ==============================
 root = Path(__file__).resolve().parent.parent
-content_dir = root / "articles/content"
+articles_dir = Path(os.environ.get("ARTICLES_DIR", str(root / "articles"))).resolve()
+content_dir = articles_dir / "content"
 processor = MarkdownImageProcessor(
-    str(root / "articles/images"), str(content_dir),
+    str(articles_dir / "images"), str(content_dir),
     is_web=True, custom_pattern="/images/{path}",
 )
 files = {}
