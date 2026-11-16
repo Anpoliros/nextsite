@@ -29,3 +29,9 @@ frontmatter 的可选 `icon` 支持：compass、code、book、camera、keyboard�
 ## 保留的旧组件
 
 `components/home/Hero.tsx`、`AsciiSceneBackground.tsx` 与 `config/home.ts` 保留为旧实现参考，当前主页不导入。
+
+## 与设计稿的布局对齐
+
+卡片列表在可用主内容列居中：侧栏展开时列表上限 664px、卡片上限 600px；收起时分别为 704px、640px，保留随机缩进和 360ms 宽度过渡。深色卡片纸面独立使用 `--card-paper`，照片白边和 caption 始终白色。标签使用独立 hashtag 列，标签在其右侧换行。
+
+`src/lib/format-date.ts` 统一英文月份日期，卡片/照片使用短月份，阅读页使用完整月份；`datetime` 属性保留原始日期。格式化固定 UTC，避免服务端和客户端日期不一致。

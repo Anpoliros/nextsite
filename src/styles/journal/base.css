@@ -171,15 +171,27 @@ body {
   width: calc(100% - 152px);
   max-width: 60rem;
   margin-inline: auto;
-  padding: 24px 0 28px;
+  padding: 36px 0 28px;
 }
 .masthead {
+  position: relative;
   display: flex;
   align-items: center;
   height: 36px;
-  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.masthead::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -12px;
+  height: 1px;
+  background: var(--line);
 }
 .site .wordmark {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: 1;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -1px;
@@ -189,6 +201,8 @@ body {
   color: var(--accent);
 }
 .site .about {
+  padding-bottom: 4px;
+  line-height: 1.2;
   margin-left: auto;
   font-size: 12px;
   border-bottom: 1px solid var(--ink);
@@ -221,7 +235,7 @@ body {
 .skip-link:focus {
   top: 12px;
 }
-@media (max-width: 850px) {
+@media (max-width: 800px) {
   .page-shell {
     width: calc(100% - 40px);
   }
@@ -241,5 +255,11 @@ body {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .page-shell {
+    padding-top: 24px;
   }
 }

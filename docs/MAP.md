@@ -84,3 +84,5 @@ docs/decisions/0001-docs-structure.md
 | `src/components/reading/` | `docs/app/overview.md`, `docs/components/layout.md` | 票据、目录、移动阅读交互变更 |
 | `build/photos.ts` | `docs/content/gallery.md` | 图片资格、均衡选图、缩略图生成变更 |
 | `preview.config.cjs`, `tests/browser.mjs` | `docs/workflows/build.md` | 独立工作树预览、浏览器验证变更 |
+
+- `src/lib/format-date.ts`：统一设计稿日期与 UTC 格式化，见 `docs/components/home.md`。

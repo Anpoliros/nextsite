@@ -7,7 +7,7 @@ import { useFloatingControl } from "./useFloatingControl";
 export default function ReaderMenu({ reading }: { reading: boolean }) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("page");
-  const floating = useFloatingControl(850);
+  const floating = useFloatingControl(800);
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();

@@ -31,6 +31,33 @@ try {
   );
   assert.equal(await page.locator("footer span").count(), 1);
   assert.equal(await page.locator(".photo-caption").count(), 3);
+  const closedWidth = await page
+    .locator(".card-slot")
+    .first()
+    .evaluate((node) => node.getBoundingClientRect().width);
+  assert.equal(closedWidth, 640);
+  const centered = await page.locator(".article-list").evaluate((node) => {
+    const list = node.getBoundingClientRect(),
+      main = node.parentElement.getBoundingClientRect();
+    return Math.abs(list.left + list.right - (main.left + main.right)) < 1;
+  });
+  assert(centered, "收起侧栏时列表在主内容列居中");
+  assert.equal(
+    await page
+      .locator(".masthead")
+      .evaluate((node) => node.getBoundingClientRect().height),
+    36,
+  );
+  assert.equal(
+    await page
+      .locator(".page-shell")
+      .evaluate((node) => getComputedStyle(node).paddingTop),
+    "36px",
+  );
+  assert.match(
+    await page.locator(".article-content time").first().textContent(),
+    /^[A-Z][a-z]{2} \d{2}, \d{4}$/,
+  );
   await page.screenshot({ path: `${output}/home-light.png` });
   for (let i = 0; i < 4; i++) {
     const below = await page
@@ -71,6 +98,12 @@ try {
     .evaluate((element) => element.getBoundingClientRect().right);
   await page.getByRole("button", { name: "展开右边栏", exact: true }).click();
   await wait(550);
+  assert(
+    (await page
+      .locator(".card-slot")
+      .first()
+      .evaluate((node) => node.getBoundingClientRect().width)) < closedWidth,
+  );
   const openedRight = await page
     .locator(".bookmark")
     .first()
@@ -104,6 +137,29 @@ try {
     await page
       .locator("html")
       .evaluate((element) => element.classList.contains("dark")),
+  );
+  for (const selector of [".hero-photo", ".photo-caption"]) {
+    assert.equal(
+      await page
+        .locator(selector)
+        .first()
+        .evaluate((node) => getComputedStyle(node).backgroundColor),
+      "rgb(255, 255, 255)",
+    );
+  }
+  assert.equal(
+    await page
+      .locator(".hashtag")
+      .first()
+      .evaluate((node) => getComputedStyle(node).color),
+    "rgb(0, 0, 0)",
+  );
+  assert.equal(
+    await page
+      .locator(".article-card")
+      .first()
+      .evaluate((node) => getComputedStyle(node).backgroundColor),
+    "rgb(27, 30, 35)",
   );
   await page.screenshot({ path: `${output}/home-dark.png` });
   for (const width of [800, 725, 390, 320]) {

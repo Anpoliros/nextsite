@@ -1,4 +1,5 @@
 /** 三层贴纸：图标、纸面和实色底片分别运动；真实链接支持新标签页和无 JS 阅读。 */
+import { formatDate } from "@/lib/format-date";
 import type { CSSProperties } from "react";
 import {
   CodeXml,
@@ -71,17 +72,21 @@ export default function ArticleCard({
         <div className="article-card-shadow" aria-hidden="true" />
         <div className="article-card">
           <div className="article-content">
-            <time dateTime={article.date}>{article.date.slice(0, 10)}</time>
+            <time dateTime={article.date}>{formatDate(article.date)}</time>
             <h3>
               <a href={`/${article.id}/`}>{article.title}</a>
             </h3>
             {article.excerpt && <p>{article.excerpt}</p>}
           </div>
           <div className="tags" aria-label="标签">
-            <span aria-hidden="true">#</span>
-            {article.tags.map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
+            <span className="hashtag" aria-hidden="true">
+              #
+            </span>
+            <div className="tag-list">
+              {article.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
           </div>
         </div>
         <a

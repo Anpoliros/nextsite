@@ -1,4 +1,5 @@
 /** 阅读页：真实 Markdown 纸面、对齐正文的上下票据、稳定内部宽度的跟随目录。 */
+import { formatDate } from "@/lib/format-date";
 import { useState } from "react";
 import ArticleBody from "@/components/shared/ArticleBody";
 import MetadataSection from "@/components/reading/MetadataSection";
@@ -34,7 +35,7 @@ export default function ArticlePage({
             <h1>{data.meta.post_title}</h1>
             {data.meta.post_datetime && (
               <time className="reading-date" dateTime={data.meta.post_datetime}>
-                {data.meta.post_datetime.slice(0, 10)}
+                {formatDate(data.meta.post_datetime, "long")}
               </time>
             )}
           </div>

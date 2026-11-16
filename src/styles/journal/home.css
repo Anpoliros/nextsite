@@ -2,7 +2,7 @@
 .main-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 200px;
-  gap: 36px;
+  gap: 24px;
   padding-block: 18px 28px;
   min-height: calc(100svh - 60px);
   overflow-anchor: none;
@@ -18,7 +18,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 24px;
+  min-height: 20px;
   margin-bottom: 26px;
   gap: 12px;
 }

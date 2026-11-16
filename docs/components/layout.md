@@ -23,3 +23,5 @@
 分类和特殊 tag 共用 tone 名称，浅深主题分别定义 `--tone`（底片）、`--tone-tint`（色块）、`--tone-ink`（前景）。深色采用较深、饱和度较高的色块和较亮的前景，避免直接复用浅色粉彩。七组前景/色块的对比度，浅色最低 5.12:1，深色最低 7.70:1。
 
 参考 [Material Color Utilities 的深浅色角色定义](https://github.com/material-foundation/material-color-utilities/blob/main/typescript/scheme/scheme.ts)，其中深色 primaryContainer 与 onPrimaryContainer 分别使用 tone 30/90，浅色使用 90/10；本项目采用独立手工配色。
+
+页框对齐 sidebar round7：桌面顶部内边距 36px，700px 及以下为 24px；页头高 36px、下间距 20px，分界线在页头下方 12px。800px 及以下页框两侧各留 20px，悬浮入口切换到移动端定位。
