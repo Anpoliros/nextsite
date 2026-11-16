@@ -1,48 +1,25 @@
 # Layout Components
 
-布局组件负责站点外框、导航、主题切换和页面主栏/侧栏结构。
-
-## 模块视角
-
-`src/components/layout/` 提供所有页面共享的框架能力。页面组件只负责传入正文和可选右侧内容，不直接重复全局 Header、Footer 或网格结构。
+`components/journal/JournalShell.tsx` 提供共用纸张、页头、footer 和独立浮动入口。
 
 ## 实现视角
 
-关键文件：
+正文最大理想宽度 60rem；窄屏左右各留 20px。页头品牌与 About 使用原生链接。`ReaderMenu` 的圆点不参与容器布局：桌面停靠外侧轨道，850px 以下浮动到右下角，左右与底部初始留白均为 24px，可按住拖动。
 
-- `src/site/Page.tsx`：根布局，接入`ThemeProvider` 和全局容器。
-- `src/components/layout/Header.tsx`：顶部导航，读取 `siteConfig.logo` 和 `siteConfig.navLinks`。
-- `src/components/layout/HeaderActions.tsx`：客户端操作区，处理主题切换和占位操作按钮。
-- `src/components/layout/PageShell.tsx`：页面内容网格，左侧主内容、右侧可选 aside。
-- `src/components/layout/Footer.tsx`：页脚文本。
-- `src/components/theme-provider.tsx`：提供 React 主题上下文、localStorage 持久化和系统主题跟随。
+`useFloatingControl` 使用 Pointer Events 捕获、按键状态与失焦清理区分点击/拖动。menu-tabs 总在圆点附近，面板向上或下延伸，只有面板内容滚动。Escape 或外部点击关闭菜单。
 
-## 数据模型
+## 读者偏好
 
-布局主要由 `src/config/layout.ts`、`src/config/site.ts` 控制：
+`theme-provider` 保留系统/浅色/深色与跨标签页同步。`Preferences` 持久化纸张底纹、动画开关、正文字号及行距。系统的减少动态效果拥有优先权。实验参数没有进入产品菜单。
 
-- `layoutConfig.gridTemplateColumns`：`PageShell` 的桌面端左右列比例。
-- `layoutConfig.headerContainer`：顶部栏容器宽度和内边距。
-- `layoutConfig.mainContainer`：主内容容器宽度和页面内边距。
-- `uiConfig.themeColors`：根布局注入的浅色/深色模式 CSS 变量。
-- `uiConfig.fontSizes`：Header、Footer 等全局布局文字尺寸。
-- `siteConfig.navLinks`：顶部导航链接。
+样式分为 `styles/journal/base.css`、`menu.css`、`cards.css`、`photos.css`、`home.css`、`reading.css`；旧布局 Header/Footer/PageShell 已移除，ASCII 和 Portals 仍保留但不挂载。
 
-## 构建与浏览器边界
+## 修改指南与验证
 
-所有页面都是普通 React 组件，构建时输出 HTML，浏览器使用相同组件树接管。访问 window、localStorage 和媒体查询的逻辑放在 useEffect 或事件处理里。首次浏览器渲染保持与构建时一致；主题提前由 HTML head 中的初始化脚本应用，正文交互挂载后跟随主题上下文。
+共用布局修改需要检查主页、长文章、404、移动端和深浅主题。SSR 初始值保持确定；浏览器 API 只在 effect 或事件里使用。运行静态与浏览器测试，确认拖动释放后悬停不会继续移动、菜单不越界、偏好刷新和跨页后仍生效。
 
-主题颜色由 `build/render.tsx` 注入，布局使用现有 Arial 和浏览器默认等宽字体。
+## 深色语义配色
 
-## 修改指南
+分类和特殊 tag 共用 tone 名称，浅深主题分别定义 `--tone`（底片）、`--tone-tint`（色块）、`--tone-ink`（前景）。深色采用较深、饱和度较高的色块和较亮的前景，避免直接复用浅色粉彩。七组前景/色块的对比度，浅色最低 5.12:1，深色最低 7.70:1。
 
-- 修改全局容器尺寸时，优先改 `src/config/layout.ts`。
-- 新增页面右栏内容时，通过 `PageShell` 的 `right` prop 注入。
-- 修改主题颜色时，优先改 `src/config/layout.ts` 的 `uiConfig.themeColors`，再检查 `src/styles/globals.css` 中是否有固定颜色覆盖。
-- 新增 Header 操作按钮时，如果需要事件处理，放在 `HeaderActions.tsx`。
-
-## 验证方式
-
-- 检查桌面端首页右侧 Portal 是否仍位于 aside。
-- 检查移动端导航是否换行到第二行并可横向滚动。
-- 切换 system、dark、light 主题，确认没有 hydration 警告或图标错位。
+参考 [Material Color Utilities 的深浅色角色定义](https://github.com/material-foundation/material-color-utilities/blob/main/typescript/scheme/scheme.ts)，其中深色 primaryContainer 与 onPrimaryContainer 分别使用 tone 30/90，浅色使用 90/10；本项目采用独立手工配色。

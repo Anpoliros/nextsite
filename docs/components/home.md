@@ -1,52 +1,31 @@
 # Home Components
 
-首页组件负责首屏 Hero、入口面板和文章时间线的展示编排。
+主页使用从 sketchbook 侧栏 Round 7 整理的手账设计，组件源码完全位于 weblog。
 
 ## 模块视角
 
-`src/components/home/` 放置首页专用组件。当前核心组件是 `Hero` 和 `AsciiSceneBackground`。`Hero` 读取 `homeConfig.hero` 渲染首页顶部横幅，`AsciiSceneBackground` 读取 `homeConfig.asciiScene` 渲染首页字符背景。它们不负责文章数据、分页或右侧 Portal 布局。
+Hero 独立于下方两栏；纸边默认收起，保留分类书签，展开后显示月历和真实文章摘要。桌面收展以右边缘为锚点，移动端改为日历/摘句并排、书签在下方。
 
 ## 实现视角
 
-- `src/components/home/Hero.tsx`：普通 React 组件，使用原生链接渲染可选的副标题链接。
-- `src/components/home/AsciiSceneBackground.tsx`：React 交互组件，按主题生成字符云、星星和流星，并在滚动时处理云层错位。
-- `src/config/home.ts`：集中维护 Hero、字符背景开关、字符背景颜色类和数量参数。
+- `components/journal/PhotoStack.tsx`：最多三层照片，固定理想宽度 380px、窄屏缩小，断点为 725px。顶图侧抽结束立即解锁，下层 DOM 保持原位，补到底部的图片重新抽取姿态且不播放入场。
+- `PhotoCaption.tsx`：独立来源标题链接和文章日期，标题省略，日期完整保留。
+- `ArticleCard.tsx`：`article-icon`、`article-card`、`article-card-shadow` 三个兄弟元素，64px 图标；实色矩形底片，回落 640ms。
+- `Sidebar.tsx`、`Calendar.tsx`：分类书签、按真实日期链接文章的月历、文章摘要摘句。
+- `useResponsiveLayout.ts`：旧布局先退场，再切换断点并显示新布局，避免宽度与方向同时插值。
 
-Hero 通过 Tailwind `dark:` 分支区分深浅主题内容，不引入客户端主题状态。
-字符背景通过 `src/components/theme-provider.tsx` 的 resolved theme 切换场景：浅色模式顶部不显示云，中部和底部分区生成云；深色模式保留少量云，并生成均匀星星背景。
+`HomePage` 筛选时记录 main-layout 相对视口的位置。若其顶部已离开视口上缘，筛选后滚动到 main-layout 顶部；否则保留当前位置。`overflow-anchor: none` 阻止浏览器自行另选锚点。
 
-## 数据模型
+## 数据与颜色
 
-`homeConfig.hero` 的关键字段：
+相册由 `build/photos.ts` 生成，见 `docs/content/gallery.md`。分类与特殊 tag 映射在 `src/config/journal.ts`；深浅主题 token 在 `src/styles/journal/base.css`。`anime → cherry → dairy` 为固定覆盖优先级，普通 tag 不覆盖分类色。
 
-- `aspectRatio`：Hero 容器纵横比。
-- `bg.light` / `bg.dark`：深浅主题背景图。
-- `align.light` / `align.dark`：标题和副标题在不同主题下的水平对齐，可选 `left` 或 `right`。
-- `title.light` / `title.dark`：不同主题下的标题文本。
-- `subtitle.light` / `subtitle.dark`：不同主题下的副标题配置，包含 `description` 和 `link`。`link` 为空字符串时渲染普通文本。
-- `colors`、`fontSizes`：Hero 文本样式。
+frontmatter 的可选 `icon` 支持：compass、code、book、camera、keyboard、heart、flower、coffee、terminal、wrench。未知值回退到 tag/分类图标。
 
-`homeConfig.asciiScene` 的关键字段：
+## 修改指南与验证
 
-- `enabled`：控制整个字符背景开关。
-- `clouds.enabled`：控制云层开关。
-- `clouds.middleCount` / `clouds.bottomCount`：控制不同主题下中部和底部云数量。
-- `clouds.classNames`：控制云层颜色、透明度和主题差异。
-- `stars.enabled` / `stars.count` / `stars.className`：控制深色模式星星背景。
-- `meteors.enabled` / `meteors.count` / `meteors.className`：控制深色模式流星。
+实验参数继续在 sketchbook 探索；产品仅暴露读者偏好。修改动效需要同时验证系统减少动态效果和用户关闭动画。检查书签筛选、收展右边缘、移动端两段式切换、照片连续切换及 caption 链接。
 
-## 修改指南
+## 保留的旧组件
 
-- 修改首页展示内容或字符背景时，优先改 `src/config/home.ts`。
-- 新增 Hero 交互时，尽量下沉到小型 React 交互组件，避免把整个首页提升为客户端组件。
-- 调整主题差异时，保持 `light` 和 `dark` 字段完整，避免某个主题回退到隐式默认值。
-
-## 验证方式
-
-- 运行 `npm run lint`。
-- 人工检查 `/`，切换浅色和深色主题，确认背景、标题、副标题和对齐方式符合配置。
-
-## 相关文档
-
-- `docs/MAP.md`
-- `docs/app/overview.md`
+`components/home/Hero.tsx`、`AsciiSceneBackground.tsx` 与 `config/home.ts` 保留为旧实现参考，当前主页不导入。

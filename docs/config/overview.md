@@ -1,5 +1,7 @@
 # Config
 
+当前手账页面使用 `config/journal.ts` 的分类/特殊 tag 规则、`config/site.ts` 的站点信息和 `config/markdown.ts` 的渲染配置。颜色 token 在 `styles/journal/base.css`。其余展示配置服务于保留的旧组件，当前不挂载。
+
 `src/config/` 负责维护站点自定义配置。配置按功能域拆分，业务代码应直接导入对应文件，避免通过混合 barrel 间接把服务端配置带入客户端组件。
 
 ## 模块视角

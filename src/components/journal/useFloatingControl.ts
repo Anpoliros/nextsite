@@ -15,7 +15,8 @@ const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(value, max));
 // visualViewport 避免移动浏览器工具栏 / 缩放令底部留白失真。
 function viewportBounds() {
-  if (typeof window === "undefined") return { left: 0, top: 0, right: 1024, bottom: 768 };
+  if (typeof window === "undefined")
+    return { left: 0, top: 0, right: 1024, bottom: 768 };
   const viewport = window.visualViewport;
   const left = viewport?.offsetLeft ?? 0;
   const top = viewport?.offsetTop ?? 0;
@@ -162,11 +163,22 @@ export function useFloatingControl(breakpoint: number) {
   return {
     mobile: position.mobile,
     direction,
-    buttonStyle: { left: position.x, top: position.y, visibility: mounted ? "visible" : "hidden" } as CSSProperties,
+    buttonStyle: {
+      left: position.x,
+      top: position.y,
+      visibility: mounted ? "visible" : "hidden",
+    } as CSSProperties,
     panelStyle: {
-      left: clamp(position.x + size - 330, bounds.left + 16, bounds.right - 346),
+      left: clamp(
+        position.x + size - 330,
+        bounds.left + 16,
+        bounds.right - 346,
+      ),
       top: direction === "down" ? edge : "auto",
-      bottom: direction === "up" ? (typeof window === "undefined" ? 768 : innerHeight) - edge : "auto",
+      bottom:
+        direction === "up"
+          ? (typeof window === "undefined" ? 768 : innerHeight) - edge
+          : "auto",
       maxHeight: Math.max(
         0,
         direction === "up" ? edge - bounds.top - 16 : bounds.bottom - edge - 16,

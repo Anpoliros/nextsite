@@ -19,8 +19,6 @@
 | `package.json`            | `docs/workflows/development.md`                  | 修改 npm scripts、依赖、开发命令或运行流程时         |
 | `src/pages/`, `src/site/`                    | `docs/app/overview.md`                           | 修改页面结构、布局、路由约定或渲染策略时             |
 | `build/routes.ts`         | `docs/app/routing.md`                            | 修改分类路由、动态路由参数或页面生成逻辑时           |
-| `src/pages/AboutPage.tsx`              | `docs/app/routing.md`                            | 修改关于页路由、页面数据来源或展示结构时             |
-| `src/pages/TagsPage.tsx`, `src/pages/TagPage.tsx`               | `docs/app/routing.md`                            | 修改标签页路由、标签数据来源或筛选逻辑时             |
 | `src/components/`             | `docs/components/overview.md`                    | 修改组件分层、公共组件约定或跨页面复用方式时         |
 | `src/components/home/`        | `docs/components/home.md`                        | 修改首页组件职责、数据输入或布局结构时               |
 | `src/components/layout/`      | `docs/components/layout.md`                      | 修改全局布局、导航、主题切换或页面框架时             |
@@ -77,3 +75,12 @@ docs/decisions/0001-docs-structure.md
 `scripts/static-files.mjs` 提供开发和生产共用的文件响应工具；static-server.mjs 是独立入口，由 Node 或 PM2 加载即启动服务。PM2 配置使用 ecosystem.config.cjs 文件名及 fork 模式。
 
 - `tests/content-sync.test.mjs`：生产 worktree 同步与本地修改保护，见 `docs/workflows/content-sync.md`。
+
+## 手账迁移版
+
+| Source Path | Documentation | Update When |
+| --- | --- | --- |
+| `src/components/journal/`, `src/styles/journal/` | `docs/components/home.md`, `docs/components/layout.md` | 主页、纸张、读者偏好和配色变更 |
+| `src/components/reading/` | `docs/app/overview.md`, `docs/components/layout.md` | 票据、目录、移动阅读交互变更 |
+| `build/photos.ts` | `docs/content/gallery.md` | 图片资格、均衡选图、缩略图生成变更 |
+| `preview.config.cjs`, `tests/browser.mjs` | `docs/workflows/build.md` | 独立工作树预览、浏览器验证变更 |
