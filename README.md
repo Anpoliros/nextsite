@@ -12,13 +12,13 @@ npm run dev          # 默认 http://127.0.0.1:5173，可配置 HOST/PORT
 npm run lint
 npm run build        # 类型检查、walking 相册、SSG → dist/
 npm test             # 产物、HTTP、选图与内容同步
-npm run preview:new  # 独立 weblog-new 进程，0.0.0.0:2324
-npm run test:browser # 默认测试本地 2324，TEST_BASE_URL 可覆盖
+npm run preview:new  # 独立 weblog-new 进程，0.0.0.0:12121
+npm run test:browser # 默认测试本地 12121，TEST_BASE_URL 可覆盖
 ```
 
 `articles/` 需要有效的内容检出；也可用 `ARTICLES_DIR` 指向其他内容目录。工作树预览使用独立文章检出，原作者工作区的未提交稿件不进入构建。
 
-正式服务的 `npm start` 默认 127.0.0.1:12121，HOST、PORT、SITE_DIR 可覆盖。`npm run deploy` 继续同步远端文章、构建并重启原 nextsite；本轮预览通过 preview.config.cjs 单独启动，不改变原服务和 webhook。
+正式服务的 `npm start` 默认 127.0.0.1:12121，HOST、PORT、SITE_DIR 可覆盖。`npm run deploy` 继续同步远端文章、构建并重启原 nextsite；新版正式服务通过 `npm run preview:new` 和 preview.config.cjs 启动，监听 12121；旧 nextsite 已移至 2324。当前部署新版请使用 `npm run build && npm run preview:new`，旧 deploy/webhook 入口继续维护旧版。
 
 ## 结构
 

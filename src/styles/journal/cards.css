@@ -112,6 +112,9 @@
   font-weight: 700;
   color: #000;
 }
+.dark .tags > .hashtag {
+  color: #fff;
+}
 .dark .home-site {
   --card-paper: #1b1e23;
 }

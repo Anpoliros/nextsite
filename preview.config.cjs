@@ -1,4 +1,4 @@
-/** 新手账工作树预览；独立进程和端口，不接管旧 weblog 服务与 webhook。 */
+/** 手账正式版本：沿用独立进程名，占用正式端口；旧版移至 2324。 */
 module.exports = {
   apps: [
     {
@@ -9,7 +9,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       watch: false,
-      env: { NODE_ENV: "production", HOST: "0.0.0.0", PORT: "2324" },
+      env: { NODE_ENV: "production", HOST: "0.0.0.0", PORT: "12121" },
     },
   ],
 };

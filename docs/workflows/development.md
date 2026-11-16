@@ -8,7 +8,7 @@
 2. 在 articles 子模块准备内容，执行 `npm run dev`。
 3. 浏览 http://127.0.0.1:5173；可通过 PORT 更改开发端口，HOST 更改监听地址。
 4. 执行 `npm run lint`、`npm run build`、`npm test`。
-5. 工作树生产预览：`npm run preview:new`，监听 `0.0.0.0:2324`；之后运行 `npm run test:browser`（首次需 `npx playwright install chromium`）。独立预览部署见 `docs/workflows/build.md`。
+5. 工作树正式服务：`npm run preview:new`，监听 `0.0.0.0:12121`；之后运行 `npm run test:browser`（首次需 `npx playwright install chromium`）。独立预览部署见 `docs/workflows/build.md`。
 
 ## 实现视角
 

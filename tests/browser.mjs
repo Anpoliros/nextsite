@@ -2,7 +2,7 @@
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { mkdir, readFile } from "node:fs/promises";
-const base = process.env.TEST_BASE_URL || "http://127.0.0.1:2324";
+const base = process.env.TEST_BASE_URL || "http://127.0.0.1:12121";
 const output = ".build/browser";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
@@ -152,7 +152,7 @@ try {
       .locator(".hashtag")
       .first()
       .evaluate((node) => getComputedStyle(node).color),
-    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
   );
   assert.equal(
     await page
