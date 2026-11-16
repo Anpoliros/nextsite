@@ -24,6 +24,7 @@ type RawPost = {
 }
 
 export type PostMeta = {
+  post_icon?: string
   post_id: number
   post_title: string
   post_path: string
@@ -99,6 +100,7 @@ function normalizePosts(raw: RawPost[]): PostMeta[] {
       : []
 
     return {
+      post_icon: typeof frontmatter.icon === 'string' ? frontmatter.icon : undefined,
       post_id: index + 1,
       post_title: String(frontmatter.title ?? ''),
       post_path: `/${category}/${slug}`,
@@ -107,7 +109,7 @@ function normalizePosts(raw: RawPost[]): PostMeta[] {
       post_tag: tags,
       post_datetime: dateToString(frontmatter.date),
       post_timestamp: dateToTimestamp(frontmatter.date),
-      post_show_toc: booleanFromFrontmatter(frontmatter.showToc ?? frontmatter.ShowToc),
+      post_show_toc: booleanFromFrontmatter(frontmatter.showToc ?? frontmatter.ShowToc ?? true),
       post_excerpt: extractMarkdownExcerpt(content),
       post_content: content,
     }

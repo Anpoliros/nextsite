@@ -1,5 +1,11 @@
 /** 全局样式：保留主题、文章排版、代码块与表格外观。 */
 @import "tailwindcss" source("../");
+@import "./journal/base.css";
+@import "./journal/menu.css";
+@import "./journal/cards.css";
+@import "./journal/photos.css";
+@import "./journal/home.css";
+@import "./journal/reading.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));

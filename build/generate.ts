@@ -24,7 +24,7 @@ await cp(publicRoot, staging, {
 });
 // 直接复制文章图片；构建不会改写原始 Markdown 或更新子模块。
 await cp(path.resolve(process.env.ARTICLES_DIR || 'articles', 'images'), path.join(staging, 'images'), { recursive: true });
-const routes = createRoutes();
+const routes = await createRoutes(staging);
 for (const route of routes) {
   const decoded = decodeURIComponent(route.path);
   const file = route.path === '/404/' ? path.join(staging, '404.html') : path.resolve(staging, `.${decoded}`, 'index.html');
