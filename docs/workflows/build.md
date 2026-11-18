@@ -8,26 +8,13 @@
 
 内容默认来自本工作树的 articles。可用 `ARTICLES_DIR` 指定另一份只读内容检出。相册详见 `docs/content/gallery.md`。
 
-## 手账正式版本
+## 正式部署
 
-分支 `feat/sticker-weblog` 的工作树位于 `~/sites/weblog-new`，文章使用独立检出，作者原目录中的未提交修改不进入预览。
+main 分支部署在 `~/sites/weblog`，手账版本已合入。运行 `npm run deploy` 同步文章到 `.build/articles`，构建成功后重启 `ecosystem.config.cjs` 中的 nextsite，监听 `127.0.0.1:12121`。构建失败保留已有静态产物。
 
-```sh
-npm ci
-npm run lint
-npm run build
-npm test
-npm run preview:new
-npm run test:browser
-```
+文章 webhook 进程为 nextsite-articles-hook，监听 `10.192.51.25:12122/hooks/articles`，只接受签名有效的 master push。Gitea 仓库投递地址需与监听地址一致，监听地址可由 `ARTICLES_HOOK_HOST` 覆盖。修改后通过 `pm2 startOrRestart ecosystem.config.cjs --only nextsite-articles-hook --update-env` 应用，最后 `pm2 save`。
 
-`preview.config.cjs` 启动独立 PM2 进程 weblog-new，监听 `0.0.0.0:12121`。检查 `/healthz`、主页和任意文章；默认测试地址为 `http://127.0.0.1:12121`，可通过 `TEST_BASE_URL` 覆盖。Playwright 首次使用可运行 `npx playwright install chromium`。
-
-正式入口继续连接 12121，目前由 weblog-new 提供；旧 nextsite 移至 `0.0.0.0:2324`。两个进程的工作树保持独立，端口交换没有接管旧 webhook。新版更新执行 `npm run build && npm run preview:new`。
-
-## 原正式部署入口
-
-`npm run deploy` 继续由 `scripts/deploy_articles.sh` 使用目录锁、同步远端文章到 `.build/articles`、构建、重启 `ecosystem.config.cjs` 的 nextsite。该入口继续负责旧版 2324，当前不得用于发布手账新版；新版使用上文命令。
+旧版 2324 进程与 weblog-new 工作树退役；`preview:new` 保留为 `npm run deploy` 的兼容别名。部署前可运行 `npm run lint`，部署后运行 `npm test`，检查 `/healthz` 和最新文章。
 
 ## HTTP 行为
 

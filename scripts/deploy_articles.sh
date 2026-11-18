@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# 正式部署：同步远端文章，构建成功后重启 nextsite；由 npm run deploy 或 webhook 调用。
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

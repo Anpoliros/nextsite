@@ -1,3 +1,4 @@
+/** 文章 push 接收器：校验 Gitea 签名后运行 deploy_articles.sh；监听地址可由 ARTICLES_HOOK_HOST 覆盖。 */
 import crypto from 'node:crypto';
 import { spawn } from 'node:child_process';
 import http from 'node:http';
@@ -6,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 // ===== Webhook 配置 =====
 // Gitea 和 nextsite 在同机或同内网时，推荐只监听本机地址。
-const HOST = '10.177.87.87';
+const HOST = process.env.ARTICLES_HOOK_HOST || '10.192.51.25';
 const PORT = 12122;
 const HOOK_PATH = '/hooks/articles';
 const EXPECTED_EVENT = 'push';
