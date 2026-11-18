@@ -1,7 +1,6 @@
 /** HTML 渲染：输出正文、元信息和当前页面数据，供浏览器一致接管。 */
 import { renderToString } from 'react-dom/server';
 import Page from '../src/site/Page';
-import { uiConfig } from '../src/config/layout';
 import { siteConfig } from '../src/config/site';
 import type { PageData } from '../src/site/types';
 
@@ -14,7 +13,7 @@ export function renderPage(data: PageData, template: string) {
   const head = `<title>${escapeHtml(data.title === siteConfig.title ? data.title : `${data.title} · ${siteConfig.title}`)}</title>
 <meta name="description" content="${escapeHtml(data.description)}">
 <link rel="icon" href="/favicon.ico">
-<style>:root{--site-bg:${uiConfig.themeColors.light.background};--site-text:${uiConfig.themeColors.light.text}}:root.dark{--site-bg:${uiConfig.themeColors.dark.background};--site-text:${uiConfig.themeColors.dark.text}}</style>
+<style>:root{--site-bg:#f5f1e8;--site-text:#302e36}:root.dark{--site-bg:#1d2025;--site-text:#eee9e0}</style>
 <script>try{var t=localStorage.getItem('theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){document.documentElement.classList.toggle('dark',matchMedia('(prefers-color-scheme: dark)').matches)}</script>`;
   return template.replace('<!--site-head-->', () => head)
     .replace('<!--site-html-->', () => renderToString(<Page data={data} />))

@@ -1,47 +1,38 @@
 # Weblog
 
-React + TypeScript + Vite 博客。构建时将 Markdown 转成完整 HTML，生产访问由静态文件服务处理。浏览器接管主题、ASCII 场景、代码块和表格交互。
+React + TypeScript + Vite 静态博客。当前迁移版将贴纸手账主页与票据阅读页接入真实 Markdown，只保留主页和文章两种内容页面。
 
-## 开发与构建
+## 开发与验证
 
-需要 Node.js 22.12+、Python 3；部署脚本还需要 Git、Git LFS、PM2。
+Node.js 22.12+、Python 3；部署还需要 Git、Git LFS、PM2。文章是独立仓库，构建只读内容，不修改 Markdown。
 
 ```sh
-npm install
-npm run dev          # http://127.0.0.1:5173
+npm ci
+npm run dev          # 默认 http://127.0.0.1:5173，可配置 HOST/PORT
 npm run lint
-npm run build        # 类型检查 + SSG，输出 dist/
-npm start            # http://127.0.0.1:12121
-npm test             # 检查已生成页面及静态 HTTP 行为
+npm run build        # 类型检查、walking 相册、SSG → dist/
+npm test             # 产物、HTTP、选图与内容同步
+npm run deploy       # 同步文章并部署正式 nextsite，127.0.0.1:12121
+npm run test:browser # 默认测试本地 12121，TEST_BASE_URL 可覆盖
 ```
 
-`dev`、普通 `build`、`start` 使用本地内容，不拉取或改写 articles。生产部署读取 `.build/articles` 中远端提交的独立 worktree，保留作者工作区。图片匹配复用现有 Python 工具，只转换内存中的内容。文章变化后需重新 build，开发预览会自动刷新。
+`articles/` 需要有效的内容检出；也可用 `ARTICLES_DIR` 指向其他内容目录。工作树预览使用独立文章检出，原作者工作区的未提交稿件不进入构建。
 
-```sh
-npm run sync-articles # 准备远端提交的独立生产检出目录
-npm run deploy        # 同步、构建，再以新 PM2 配置启动或重启静态服务
-```
+正式工作目录为 `~/sites/weblog`，使用 main 分支。`npm run deploy` 同步远端文章到 `.build/articles`，构建成功后重启 `ecosystem.config.cjs` 中的 nextsite（127.0.0.1:12121）。文章 webhook 由同一配置中的 nextsite-articles-hook 运行，监听 `10.192.51.25:12122/hooks/articles`；`ARTICLES_HOOK_HOST` 可覆盖监听地址。旧版 2324 服务已退役，`preview:new` 仅保留为 deploy 的兼容别名。
 
-`PORT`、`HOST`、`SITE_DIR` 可配置静态服务的端口、地址和文件目录。默认保持 12121 端口及 PM2 名称 nextsite。部署使用 `ecosystem.config.cjs`；旧 `ecosystem.config.js` 保留了迁移前的未提交修改，不再作为启动入口。文章 webhook 使用新配置中的 nextsite-articles-hook。
-
-## 目录
+## 结构
 
 ```text
-src/pages/           React 页面，只接收展示数据
-src/components/      布局、Hero、Portals、ASCII 和文章交互
-src/config/          站点与展示配置
-src/lib/markdown/    构建端 Markdown 渲染
-src/lib/ascii/       字符画算法与构建端图片转换
-src/site/            页面数据协议、公共布局、URL 和日期规则
-src/styles/          全局样式
-build/               内容读取、路由枚举、HTML 渲染、SSG 与开发预览
-articles/            独立文章仓库子模块
-scripts/             内容工具、静态服务与发布入口
-dist/                可独立部署的静态产物（不提交 Git）
+src/pages/                 主页、文章组合
+src/components/journal/    手账组件、相册、纸边与读者偏好
+src/components/reading/    票据、目录与阅读跟随
+src/styles/journal/        深浅语义配色和各模块样式
+src/lib/markdown/          Markdown 编译、代码、表格、目录
+src/site/                  页面数据与静态/浏览器共用入口
+build/                     文章读取、选图、路由、SSG、开发预览
+articles/                  独立内容仓库
 ```
 
-分页 URL 使用 `/page/2/`、`/<category>/page/2/`、`/tags/<tag>/page/2/`，按钮由统一路径工具生成。页面之间使用浏览器正常跳转。未来 Shizunet 登录和评论后端独立接入，当前阶段保留既有显示效果。
+分类通过主页书签筛选；tag 作为元数据和卡片色覆盖依据，不生成独立页面。About 使用文章模板。旧 ASCII、Portals 与 Hero 保留源码，当前不挂载。产品代码完全独立于 sketchbook。
 
-文档入口见 `docs/README.md`。
-
-首次部署检测 nextsite 的实际脚本路径；仍指向 Next 时，在构建成功后删除旧进程并按静态配置重新注册，后续发布直接重启。
+文档入口见 `docs/README.md`；迁移路由见 `docs/app/routing.md`，选图规则见 `docs/content/gallery.md`。

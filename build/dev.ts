@@ -10,8 +10,9 @@ const server = createServer();
 const vite = await createViteServer({
   server: { middlewareMode: true, hmr: { server } }, appType: 'custom',
 });
-vite.watcher.add(path.resolve('articles/content'));
-vite.watcher.add(path.resolve('articles/images'));
+const articlesRoot = path.resolve(process.env.ARTICLES_DIR || 'articles');
+vite.watcher.add(path.join(articlesRoot, 'content'));
+vite.watcher.add(path.join(articlesRoot, 'images'));
 let cached: Route[] | undefined;
 let previousFactory: unknown;
 vite.watcher.on('all', (_event, filename) => {
@@ -26,7 +27,7 @@ vite.watcher.on('all', (_event, filename) => {
 server.on('request', async (req, res) => {
   try {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-    if (pathname.startsWith('/images/') && await serveFile(req, res, 'articles/images', pathname.slice(7))) return;
+    if (pathname.startsWith('/images/') && await serveFile(req, res, path.join(articlesRoot, 'images'), pathname.slice(7))) return;
     if (pathname === '/favicon.ico' && await serveFile(req, res, 'public', pathname)) return;
     vite.middlewares(req, res, async () => {
       try {
@@ -35,7 +36,7 @@ server.on('request', async (req, res) => {
         }
         const { createRoutes, notFoundPage } = await vite.ssrLoadModule('/build/routes.ts');
         if (!cached || previousFactory !== createRoutes) {
-          cached = createRoutes(); previousFactory = createRoutes;
+          cached = await createRoutes(); previousFactory = createRoutes;
         }
         const normalized = pathname.endsWith('/') ? pathname : `${pathname}/`;
         const route = cached!.find(item => decodeURIComponent(item.path) === decodeURIComponent(normalized));
@@ -55,4 +56,5 @@ server.on('request', async (req, res) => {
   }
 });
 const port = Number(process.env.PORT || 5173);
-server.listen(port, '127.0.0.1', () => console.log(`开发预览：http://127.0.0.1:${port}`));
+const host = process.env.HOST || '127.0.0.1';
+server.listen(port, host, () => console.log(`开发预览：http://${host}:${port}`));

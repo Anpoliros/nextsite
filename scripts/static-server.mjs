@@ -13,6 +13,11 @@ const server = createServer(async (req, res) => {
       res.writeHead(405, { Allow: 'GET, HEAD' }); res.end(); return;
     }
     const pathname = new URL(req.url, 'http://localhost').pathname;
+    if (pathname === '/healthz') {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
+      res.end(req.method === 'HEAD' ? undefined : JSON.stringify({ status: 'ok' }));
+      return;
+    }
     if (pathname !== '/404/' && pathname !== '/404.html' && await serveFile(req, res, root, pathname)) return;
     const body = await readFile(path.join(root, '404.html'));
     res.writeHead(404, { 'Content-Type': mime['.html'], 'Cache-Control': 'no-cache' });

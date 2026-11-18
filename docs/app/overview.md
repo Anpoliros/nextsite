@@ -1,23 +1,25 @@
 # Pages
 
-`src/pages/` 的 React 组件显示构建端提供的 `PageData`，构建端与浏览器共用组件树。
+主页与文章由同一 React 树静态生成，再由浏览器接管。
 
 ## 模块视角
 
-`src/site/Page.tsx` 组合主题上下文、Header、main 和 Footer，并按页面 kind 选择组件。`build/routes.ts` 准备页面数据，`build/render.tsx` 生成 HTML 和元信息。
+`src/site/Page.tsx` 组合主题、读者偏好和 `JournalShell`，根据 `PageData.kind` 显示主页、文章或错误提示。
 
 ## 实现视角
 
-- `HomePage.tsx`：Hero、ASCII 场景、Portals、置顶和时间线。
-- `CategoryPage.tsx`、`TagPage.tsx`：筛选列表、说明及分页。
-- `TagsPage.tsx`：按分类聚合标签。
-- `ArticlePage.tsx`：正文、目录、上一篇/随机/下一篇。
-- `AboutPage.tsx`、`NotFoundPage.tsx`：关于页和错误页面。
+- `HomePage.tsx`：稳定 Hero、分类筛选、分页、贴纸列表、书签/日历/摘句纸边。
+- `ArticlePage.tsx`：真实 Markdown 纸面、上下票据、篇间导航、跟随目录和移动端抽屉。
+- `components/journal/`：共用纸张、浮动入口、读者偏好、相册和主页组件。
+- `components/reading/`：票据与桌面/移动目录。
+- `build/routes.ts`：展示数据与路径枚举；文件读取仅在构建端执行。
+
+原有 ASCII、Portals、旧 Hero 的实现保留于 `components/home/` 和 `components/portals/`，当前页面不加载。
 
 ## 修改指南
 
-页面组件接收可序列化的展示数据；文件读取和 Markdown 编译在 build 中完成。新增页面时同步扩展 `src/site/types.ts`、`Page.tsx` 和 `build/routes.ts`。
+浏览器初始树必须与静态 HTML 一致。随机相片顺序与姿态、当前月份、媒体查询和持久化偏好均在 effect 后初始化；文章图标倾角和缩进使用稳定哈希。浏览器组件不得导入 `build/` 或 sketchbook 文件。
 
 ## 验证方式
 
-运行 `npm run lint`、`npm run build`、`npm test`，检查桌面和移动端；确认浏览器没有 hydration 错误。
+`npm run lint`、`npm run build`、`npm test`；启动静态预览后运行 `npm run test:browser`，检查没有 hydration 错误、窄屏横向溢出或失效导航。

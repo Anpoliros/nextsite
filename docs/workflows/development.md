@@ -6,8 +6,9 @@
 
 1. 安装 Node.js 22.12+ 和 Python 3，执行 `npm install`。
 2. 在 articles 子模块准备内容，执行 `npm run dev`。
-3. 浏览 http://127.0.0.1:5173；可通过 PORT 更改开发端口。
+3. 浏览 http://127.0.0.1:5173；可通过 PORT 更改开发端口，HOST 更改监听地址。
 4. 执行 `npm run lint`、`npm run build`、`npm test`。
+5. 工作树正式服务：`npm run preview:new`，监听 `0.0.0.0:12121`；之后运行 `npm run test:browser`（首次需 `npx playwright install chromium`）。独立预览部署见 `docs/workflows/build.md`。
 
 ## 实现视角
 
@@ -15,4 +16,4 @@
 
 ## 验证方式
 
-检查新文章预览、源码热更新和深层页面刷新；检查代码复制、表格操作、主题持久化和 ASCII。
+检查新文章预览、源码热更新和深层页面刷新；检查代码复制、表格操作、主题/阅读偏好持久化、照片切换和目录跟随。ASCII 源码保留，当前页面未挂载。
