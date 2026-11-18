@@ -1,4 +1,4 @@
-/** 静态博客和文章 webhook 的 PM2 配置，沿用现有服务名称和端口。 */
+/** 静态博客和文章 webhook 的 PM2 配置，旧版保留原进程名称，迁至 2324 供对照。 */
 module.exports = {
   apps: [
     {
@@ -9,7 +9,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       watch: false,
-      env: { NODE_ENV: 'production', PORT: '12121', HOST: '127.0.0.1' },
+      env: { NODE_ENV: 'production', PORT: '2324', HOST: '0.0.0.0' },
     },
     {
       name: 'nextsite-articles-hook',
